@@ -17,6 +17,8 @@ public class Hotel {
     private String city;
     @Column(nullable = false,length = 80)
     private String country;
+    @Column(nullable = false,length = 80)
+    private String name;
 
     public long getId() {
         return id;
@@ -64,6 +66,14 @@ public class Hotel {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
 
