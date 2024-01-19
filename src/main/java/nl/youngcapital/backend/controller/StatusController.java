@@ -3,6 +3,7 @@ package nl.youngcapital.backend.controller;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import nl.youngcapital.backend.model.Hotel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
