@@ -1,18 +1,28 @@
 package nl.youngcapital.backend.model;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Hotel {
-    private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+    @Column(length = 50,nullable = false)
     private String street;
-    private int HouseNumber;
-    private String ZipCode;
-    private String City;
+    @Column(nullable = false,length = 10)
+    private String houseNumber;
+    @Column(nullable = false,length = 10)
+    private String zipCode;
+    @Column(nullable = false,length = 50)
+    private String city;
+    @Column(nullable = false,length = 80)
+    private String country;
 
-
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -24,27 +34,37 @@ public class Hotel {
         this.street = street;
     }
 
-    public int getHouseNumber() {
-        return HouseNumber;
+    public String getHouseNumber() {
+        return houseNumber;
     }
 
-    public void setHouseNumber(int houseNumber) {
-        HouseNumber = houseNumber;
+    public void setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
     }
 
     public String getZipCode() {
-        return ZipCode;
+        return zipCode;
     }
 
     public void setZipCode(String zipCode) {
-        ZipCode = zipCode;
+        this.zipCode = zipCode;
     }
 
     public String getCity() {
-        return City;
+        return city;
     }
 
     public void setCity(String city) {
-        City = city;
+        this.city = city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 }
+
+
