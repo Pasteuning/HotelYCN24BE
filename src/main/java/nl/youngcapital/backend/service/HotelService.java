@@ -13,4 +13,12 @@ public class HotelService {
         return hotelRepository.findAll();
     }
 
+  //  public void createHotel{
+//        hotelRepository.save(new Hotel());
+
+
+  //  }
+
 }
+
+
