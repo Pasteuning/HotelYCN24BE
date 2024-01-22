@@ -13,11 +13,11 @@ public class HotelService {
         return hotelRepository.findAll();
     }
 
-  //  public void createHotel{
-//        hotelRepository.save(new Hotel());
-
-
-  //  }
+    public Hotel createHotel (Hotel hotel){
+        hotelRepository.save(hotel);
+        System.out.println("Hotel successfully created: \n" + hotel);
+        return hotel;
+    }
 
 }
 
