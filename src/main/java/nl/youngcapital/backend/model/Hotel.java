@@ -7,7 +7,7 @@ public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(length = 50,nullable = false)
+    @Column(nullable = false, length = 50)
     private String street;
     @Column(nullable = false,length = 10)
     private String houseNumber;
