@@ -12,6 +12,7 @@ import java.util.Optional;
 public class HotelService {
     @Autowired
     private HotelRepository hotelRepository;
+
     public Iterable<Hotel> getAllHotels(){
         return hotelRepository.findAll();
     }

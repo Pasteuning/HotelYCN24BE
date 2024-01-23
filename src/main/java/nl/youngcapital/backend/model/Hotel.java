@@ -10,18 +10,18 @@ public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(nullable = false,length = 80)
+    private String name;
     @Column(nullable = false, length = 50)
     private String street;
-    @Column(nullable = false,length = 10)
+    @Column(nullable = false,length = 30)
     private String houseNumber;
-    @Column(nullable = false,length = 10)
+    @Column(nullable = false,length = 30)
     private String zipCode;
-    @Column(nullable = false,length = 50)
+    @Column(nullable = false,length = 200)
     private String city;
     @Column(nullable = false,length = 80)
     private String country;
-    @Column(nullable = false,length = 80)
-    private String name;
     @OneToMany
     List<Room> room = new ArrayList<>();
 
