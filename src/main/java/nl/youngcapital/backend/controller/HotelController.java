@@ -5,7 +5,6 @@ import nl.youngcapital.backend.service.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @RestController
@@ -34,7 +33,7 @@ public class HotelController {
         hotelService.deleteHotel(id);
     }
 
-    @GetMapping ("/edithotel/{id}")
+    @PostMapping ("/edithotel/{id}")
     public Hotel editHotel (@PathVariable long id, @RequestBody Hotel updatedHotel) {
         return hotelService.editHotel(id, updatedHotel);
 

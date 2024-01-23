@@ -2,6 +2,9 @@ package nl.youngcapital.backend.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Hotel {
     @Id
@@ -19,6 +22,10 @@ public class Hotel {
     private String country;
     @Column(nullable = false,length = 80)
     private String name;
+    @OneToMany
+    List<Room> room = new ArrayList<>();
+
+
 
     public long getId() {
         return id;
@@ -76,6 +83,13 @@ public class Hotel {
         this.name = name;
     }
 
+    public List<Room> getRoom() {
+        return room;
+    }
+
+    public void setRoom(List<Room> room) {
+        this.room = room;
+    }
 
     @Override
     public String toString() {
