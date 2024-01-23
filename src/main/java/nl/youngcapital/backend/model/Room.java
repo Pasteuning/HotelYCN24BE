@@ -8,8 +8,8 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    roomType mijnKamersType;
-    public enum roomType{
+    kamersType roomType;
+    public enum kamersType{
         SINGLE, DOUBLE, FAMILY;
     }
 
@@ -42,12 +42,12 @@ public class Room {
         this.price = price;
     }
 
-    public roomType getMijnKamersType() {
-        return mijnKamersType;
+    public kamersType getRoomType() {
+        return roomType;
     }
 
-    public void setMijnKamersType(roomType mijnKamersType) {
-        this.mijnKamersType = mijnKamersType;
+    public void setRoomType(kamersType roomType) {
+        this.roomType = roomType;
     }
 }
 
