@@ -16,7 +16,7 @@ public class Room {
     @Column(nullable = false, length = 10)
     private Double price;
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name="rooms")
     private Hotel hotel;
 
 
