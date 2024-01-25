@@ -10,20 +10,20 @@ public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(nullable = false,length = 80)
+    private String name;
     @Column(nullable = false, length = 50)
     private String street;
-    @Column(nullable = false,length = 10)
+    @Column(nullable = false,length = 30)
     private String houseNumber;
-    @Column(nullable = false,length = 10)
+    @Column(nullable = false,length = 30)
     private String zipCode;
-    @Column(nullable = false,length = 50)
+    @Column(nullable = false,length = 200)
     private String city;
     @Column(nullable = false,length = 80)
     private String country;
-    @Column(nullable = false,length = 80)
-    private String name;
     @OneToMany
-    List<Room> room = new ArrayList<>();
+    private List<Room> rooms = new ArrayList<>();
 
 
 
@@ -83,12 +83,12 @@ public class Hotel {
         this.name = name;
     }
 
-    public List<Room> getRoom() {
-        return room;
+    public List<Room> getRooms() {
+        return rooms;
     }
 
-    public void setRoom(List<Room> room) {
-        this.room = room;
+    public void setRooms(List<Room> room) {
+        this.rooms = room;
     }
 
     @Override

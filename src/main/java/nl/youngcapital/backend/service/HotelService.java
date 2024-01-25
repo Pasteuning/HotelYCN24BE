@@ -1,23 +1,43 @@
 package nl.youngcapital.backend.service;
 
 import nl.youngcapital.backend.model.Hotel;
+import nl.youngcapital.backend.model.Room;
 import nl.youngcapital.backend.repository.HotelRepository;
+import nl.youngcapital.backend.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class HotelService {
     @Autowired
     private HotelRepository hotelRepository;
+    @Autowired
+    private RoomRepository roomRepository;
+
+
     public Iterable<Hotel> getAllHotels(){
         return hotelRepository.findAll();
     }
 
     public Optional<Hotel> getHotel(long id) {
         return hotelRepository.findById(id);
+    }
+
+    public Iterable<Room> getRooms(long hotelId) {
+        Iterable<Room> allRooms = roomRepository.findAll();
+
+        //deze arraylist wordt gevuld met rooms die de gegeven hotelId hebben
+        List<Room> rooms = new ArrayList<>();
+        for (Room room: allRooms) {
+            if (room.getHotel().getId() == hotelId) {
+                rooms.add(room);
+            }
+        }
+        return rooms;
     }
 
     public Hotel createHotel (Hotel hotel){
