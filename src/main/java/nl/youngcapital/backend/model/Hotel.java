@@ -23,7 +23,7 @@ public class Hotel {
     @Column(nullable = false,length = 80)
     private String country;
     @OneToMany
-    List<Room> room = new ArrayList<>();
+    private List<Room> rooms = new ArrayList<>();
 
 
 
@@ -83,12 +83,12 @@ public class Hotel {
         this.name = name;
     }
 
-    public List<Room> getRoom() {
-        return room;
+    public List<Room> getRooms() {
+        return rooms;
     }
 
-    public void setRoom(List<Room> room) {
-        this.room = room;
+    public void setRooms(List<Room> room) {
+        this.rooms = room;
     }
 
     @Override

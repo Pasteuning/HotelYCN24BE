@@ -1,6 +1,7 @@
 package nl.youngcapital.backend.controller;
 
 import nl.youngcapital.backend.model.Hotel;
+import nl.youngcapital.backend.model.Room;
 import nl.youngcapital.backend.service.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,11 @@ public class HotelController {
     @GetMapping("/hotel/{id}")
     public Optional<Hotel> getHotel(@PathVariable long id) {
         return hotelService.getHotel(id);
+    }
+
+    @GetMapping("/hotel/{hotelId}/rooms")
+    public Iterable<Room> getRooms(@PathVariable long hotelId) {
+        return hotelService.getRooms(hotelId);
     }
 
     @PostMapping("/createhotel")
