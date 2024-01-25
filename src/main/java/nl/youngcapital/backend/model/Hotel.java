@@ -22,7 +22,7 @@ public class Hotel {
     private String city;
     @Column(nullable = false,length = 80)
     private String country;
-    @OneToMany
+    @OneToMany(mappedBy = "hotel")
     private List<Room> rooms = new ArrayList<>();
 
 

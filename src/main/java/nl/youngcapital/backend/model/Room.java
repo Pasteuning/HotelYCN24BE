@@ -1,5 +1,6 @@
 package nl.youngcapital.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,7 +17,6 @@ public class Room {
     @Column(nullable = false, length = 10)
     private Double price;
     @ManyToOne
-    @JoinColumn(name="rooms")
     private Hotel hotel;
 
 
@@ -53,10 +53,12 @@ public class Room {
         this.roomType = roomType;
     }
 
+    @JsonIgnore
     public Hotel getHotel() {
         return hotel;
     }
 
+    @JsonIgnore
     public void setHotel(Hotel hotel) {
         this.hotel = hotel;
     }
