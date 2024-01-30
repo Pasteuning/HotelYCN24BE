@@ -29,7 +29,7 @@ public class HotelController {
 
 
 
-    @GetMapping("/hotel/{id}")
+    @GetMapping("/hotelqq/{id}")
     public HotelDto getHotel2(@PathVariable ("id") long id) {
         Hotel hotel = hotelService.getHotel(id).get();
         return new HotelDto(hotel);

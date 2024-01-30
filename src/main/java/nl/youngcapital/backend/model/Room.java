@@ -62,6 +62,17 @@ public class Room {
     public void setHotel(Hotel hotel) {
         this.hotel = hotel;
     }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "id=" + id +
+                ", roomType=" + roomType +
+                ", noBeds=" + noBeds +
+                ", price=" + price +
+                ", hotel=" + hotel +
+                '}';
+    }
 }
 
 
