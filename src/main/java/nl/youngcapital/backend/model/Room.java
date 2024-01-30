@@ -3,6 +3,9 @@ package nl.youngcapital.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Room {
     public enum RoomType { SINGLE, DOUBLE, FAMILY }
@@ -18,6 +21,8 @@ public class Room {
     private Double price;
     @ManyToOne
     private Hotel hotel;
+    @OneToMany(mappedBy = "room")
+    private List<Reservation> reservation = new ArrayList<>();
 
 
 
@@ -63,6 +68,15 @@ public class Room {
         this.hotel = hotel;
     }
 
+    public List<Reservation> getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(List<Reservation> reservation) {
+        this.reservation = reservation;
+    }
+
+
     @Override
     public String toString() {
         return "Room{" +
@@ -71,6 +85,7 @@ public class Room {
                 ", noBeds=" + noBeds +
                 ", price=" + price +
                 ", hotel=" + hotel +
+                ", reservation=" + reservation +
                 '}';
     }
 }
