@@ -35,6 +35,14 @@ public class Hotel {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getStreet() {
         return street;
     }
@@ -75,14 +83,6 @@ public class Hotel {
         this.country = country;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public List<Room> getRooms() {
         return rooms;
     }
@@ -95,12 +95,13 @@ public class Hotel {
     public String toString() {
         return "Hotel{" +
                 "id=" + id +
+                ", name='" + name + '\'' +
                 ", street='" + street + '\'' +
                 ", houseNumber='" + houseNumber + '\'' +
                 ", zipCode='" + zipCode + '\'' +
                 ", city='" + city + '\'' +
                 ", country='" + country + '\'' +
-                ", name='" + name + '\'' +
+                ", rooms=" + rooms +
                 '}';
     }
 }

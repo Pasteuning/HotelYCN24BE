@@ -33,7 +33,7 @@ public class HotelService {
         //deze arraylist wordt gevuld met rooms die de gegeven hotelId hebben
         List<Room> rooms = new ArrayList<>();
         for (Room room: allRooms) {
-            if (room.getHotel().getId() == hotelId) {
+            if (room.getHotel() != null  && room.getHotel().getId() == hotelId) {
                 rooms.add(room);
             }
         }
