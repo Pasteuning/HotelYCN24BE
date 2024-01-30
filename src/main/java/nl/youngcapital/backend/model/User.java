@@ -3,6 +3,8 @@ package nl.youngcapital.backend.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class User {
@@ -29,6 +31,8 @@ public class User {
     private String email;
     @Column(length = 100)
     private String phoneNumber;
+    @OneToMany(mappedBy = "user")
+    private List<Reservation> reservation = new ArrayList<>();
 
 
 
@@ -120,6 +124,14 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public List<Reservation> getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(List<Reservation> reservation) {
+        this.reservation = reservation;
+    }
+
 
     @Override
     public String toString() {
@@ -135,6 +147,7 @@ public class User {
                 ", country='" + country + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
+                ", reservation=" + reservation +
                 '}';
     }
 }
