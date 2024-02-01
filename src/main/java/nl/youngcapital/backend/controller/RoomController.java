@@ -1,7 +1,6 @@
 package nl.youngcapital.backend.controller;
 
 import nl.youngcapital.backend.model.Room;
-import nl.youngcapital.backend.service.HotelService;
 import nl.youngcapital.backend.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

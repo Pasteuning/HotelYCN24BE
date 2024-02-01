@@ -2,6 +2,7 @@ package nl.youngcapital.backend.service;
 
 import nl.youngcapital.backend.model.Hotel;
 import nl.youngcapital.backend.model.Room;
+import nl.youngcapital.backend.repository.HotelRepository;
 import nl.youngcapital.backend.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ public class RoomService {
     @Autowired
     private RoomRepository roomRepository;
     @Autowired
-    private HotelService hotelService;
+    private HotelRepository hotelRepository;
 
 
 
@@ -26,11 +27,9 @@ public class RoomService {
     }
 
     public Room createRoom (Room room, long hotelId) {
-        Optional<Hotel> optionalHotel = hotelService.getHotel(hotelId);
-
         //Koppelt een hotel aan een kamer indien het hotel bestaat. Anders blijft hotel null
-        if (hotelService.getHotel(hotelId).isPresent()) {
-            Hotel hotel = optionalHotel.get();
+        if (hotelRepository.findById(hotelId).isPresent()) {
+            Hotel hotel = hotelRepository.findById(hotelId).get();
             room.setHotel(hotel);
             roomRepository.save(room);
             System.out.println("Room successfully created \n" + room);
@@ -59,8 +58,8 @@ public class RoomService {
         if (updatedRoom.getPrice() != null) {
             room.setPrice(updatedRoom.getPrice());
         }
-        if (hotelService.getHotel(hotelId).isPresent()){
-            Hotel hotel = hotelService.getHotel(hotelId).orElseThrow();
+        if (hotelRepository.findById(hotelId).isPresent()){
+            Hotel hotel = hotelRepository.findById(hotelId).get();
             room.setHotel(hotel);
         }
 
