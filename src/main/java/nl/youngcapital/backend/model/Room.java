@@ -18,7 +18,7 @@ public class Room {
     @Column(nullable = false, length = 4)
     private int noBeds;
     @Column(nullable = false, length = 10)
-    private Double price;
+    private double price;
     @ManyToOne
     private Hotel hotel;
     @OneToMany(mappedBy = "room")
