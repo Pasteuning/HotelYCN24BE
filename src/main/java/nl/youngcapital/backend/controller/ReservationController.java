@@ -1,6 +1,9 @@
 package nl.youngcapital.backend.controller;
 
+import nl.youngcapital.backend.model.Hotel;
 import nl.youngcapital.backend.model.Reservation;
+import nl.youngcapital.backend.model.ReservationDTO;
+import nl.youngcapital.backend.repository.HotelRepository;
 import nl.youngcapital.backend.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +16,10 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
+
     @GetMapping("/allreservations")
-    public Iterable<Reservation> getAllReservations() {
-        return reservationService.getAllReservations();
+    public Iterable<ReservationDTO> getAllReservations(@RequestParam String sort){
+        return reservationService.getAllReservations(sort);
     }
 
     @GetMapping("/reservations/{id}")
@@ -37,5 +41,15 @@ public class ReservationController {
     @PostMapping("/editreservation/{id}")
     public Reservation editReservation(@PathVariable long id, @RequestBody Reservation updatedReservation) {
         return reservationService.editReservation(id, updatedReservation);
+    }
+
+    @PostMapping("/reservations/assignroom")
+    public void assignRoom(@RequestParam long reservationId, @RequestParam long roomId) {
+        reservationService.assignRoom(reservationId, roomId);
+    }
+
+    @PostMapping("/reservations/assignuser")
+    public void assignUser(@RequestParam long reservationId, @RequestParam long userId) {
+        reservationService.assignUser(reservationId, userId);
     }
 }
