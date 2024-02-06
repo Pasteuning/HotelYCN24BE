@@ -1,10 +1,12 @@
 package nl.youngcapital.backend.controller;
 
 import nl.youngcapital.backend.model.Room;
+import nl.youngcapital.backend.model.RoomDTO;
 import nl.youngcapital.backend.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -23,6 +25,17 @@ public class RoomController {
     @GetMapping("/room/{id}")
     public Optional<Room> getRoom(@PathVariable long id){
         return roomService.getRoom(id);
+    }
+
+    @GetMapping("/searchrooms/{hotelId}")
+    public Iterable<RoomDTO> searchRooms(@PathVariable long hotelId, @RequestParam LocalDate cid, @RequestParam LocalDate cod, @RequestParam int adults, @RequestParam int children) {
+        System.out.println("Received: ");
+        System.out.println("HotelId: " + hotelId +
+                ", Check-in: " + cid +
+                ", Check-out: " + cod +
+                ", Adults: " + adults +
+                ", Children: " + children);
+        return roomService.searchRooms(hotelId, cid, cod, adults, children);
     }
 
     @PostMapping("/createroom")

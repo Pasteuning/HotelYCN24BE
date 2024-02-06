@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ReservationService {
@@ -99,18 +98,36 @@ public class ReservationService {
         } return list;
     }
 
-    public Optional<Reservation> getReservation(long id) {
+    public ReservationDTO getReservation(long id) {
         if (reservationRepository.existsById(id)) {
-            return reservationRepository.findById(id);
-        } else return Optional.empty();
+            Reservation reservation = reservationRepository.findById(id).orElseThrow();
+            return new ReservationDTO(reservation);
+        } else return null;
     }
 
-    public Reservation createReservation (Reservation reservation) {
+    public ReservationDTO createReservation (ReservationDTO reservationDTO) {
+        Reservation reservation = reservationDTO.getReservation();
+        ReservationDTO dto = new ReservationDTO(reservation);
+        if (roomRepository.existsById(reservationDTO.getRoomId())) {
+            Room room = roomRepository.findById(reservationDTO.getRoomId()).orElseThrow();
+            reservation.setRoom(room);
+            dto.setRoomId(room.getId());
+            dto.setHotelId(room.getHotel().getId());
+            dto.setHotelName(room.getHotel().getName());
+        }
+        if (userRepository.existsById(reservationDTO.getUserId())) {
+            User user = userRepository.findById(reservationDTO.getUserId()).orElseThrow();
+            reservation.setUser(user);
+            dto.setUserId(user.getId());
+            dto.setFirstName(user.getFirstName());
+            dto.setLastName(user.getLastName());
+        }
+
         //zet surcharge op true indien er kinderen komen
-        reservation.setSurcharge(reservation.getChildren() != 0);
+        reservation.setSurcharge(reservationDTO.getReservation().getChildren() != 0);
         reservationRepository.save(reservation);
         System.out.println("Reservation successfully created: \n" + reservation);
-        return reservation;
+        return dto;
     }
 
     public void deleteReservation (long id) {
@@ -122,33 +139,33 @@ public class ReservationService {
         }
     }
 
-    public Reservation editReservation(long id, Reservation updatedReservation) {
-
-        if (reservationRepository.existsById(id)) {
-            Reservation reservation = reservationRepository.findById(id).orElseThrow();
-            if (updatedReservation.getCiDate() != null) {
-                reservation.setCiDate(updatedReservation.getCiDate());
-            }
-            if (updatedReservation.getCoDate() != null) {
-                reservation.setCoDate(updatedReservation.getCoDate());
-            }
-            if (updatedReservation.getAdults() != 0) {
-                reservation.setAdults(updatedReservation.getAdults());
-            }
-            reservation.setChildren(updatedReservation.getChildren());
-            //zet surcharge op true indien er kinderen komen
-            reservation.setSurcharge(updatedReservation.getChildren() != 0);
-
-            reservationRepository.save(reservation);
-            System.out.println("Reservation successfully updated: \n" + reservation);
-            return reservation;
-        } else {
-            //creëert een nieuwe reservation als de reservation niet bestaat
-            System.out.println("Reservation not found for id: " + id);
-            System.out.println("Creating new reservation");
-            return createReservation(updatedReservation);
-        }
-    }
+//    public ReservationDTO editReservation(long id, ReservationDTO updatedReservation) {
+//
+//        if (reservationRepository.existsById(id)) {
+//            Reservation reservation = reservationRepository.findById(id).orElseThrow();
+//            if (updatedReservation.getCiDate() != null) {
+//                reservation.setCiDate(updatedReservation.getCiDate());
+//            }
+//            if (updatedReservation.getCoDate() != null) {
+//                reservation.setCoDate(updatedReservation.getCoDate());
+//            }
+//            if (updatedReservation.getAdults() != 0) {
+//                reservation.setAdults(updatedReservation.getAdults());
+//            }
+//            reservation.setChildren(updatedReservation.getChildren());
+//            //zet surcharge op true indien er kinderen komen
+//            reservation.setSurcharge(updatedReservation.getChildren() != 0);
+//
+//            reservationRepository.save(reservation);
+//            System.out.println("Reservation successfully updated: \n" + reservation);
+//            return reservation;
+//        } else {
+//            //creëert een nieuwe reservation als de reservation niet bestaat
+//            System.out.println("Reservation not found for id: " + id);
+//            System.out.println("Creating new reservation");
+//            return createReservation(updatedReservation);
+//        }
+//    }
 
     public void assignRoom(long reservationId, long roomId) {
         if (reservationRepository.existsById(reservationId) && roomRepository.existsById(roomId)) {

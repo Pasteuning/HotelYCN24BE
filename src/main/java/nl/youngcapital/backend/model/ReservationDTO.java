@@ -20,6 +20,17 @@ public class ReservationDTO {
 //        this.lastName = reservation.getUser().getLastName();
 //    }
 
+
+    public ReservationDTO(Long hotelId, String hotelName, Long roomId, Reservation reservation, Long userId, String firstName, String lastName) {
+        this.hotelId = hotelId;
+        this.hotelName = hotelName;
+        this.roomId = roomId;
+        this.reservation = reservation;
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public ReservationDTO(Reservation reservation) {
         this.hotelId = (reservation.getRoom() != null) ? reservation.getRoom().getHotel().getId() : null;
         this.hotelName = (reservation.getRoom() != null) ? reservation.getRoom().getHotel().getName() : null;
@@ -86,5 +97,19 @@ public class ReservationDTO {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+
+    @Override
+    public String toString() {
+        return "ReservationDTO{" +
+                "hotelId=" + hotelId +
+                ", hotelName='" + hotelName + '\'' +
+                ", roomId=" + roomId +
+                ", reservation=" + reservation +
+                ", userId=" + userId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
     }
 }
