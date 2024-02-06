@@ -76,18 +76,6 @@ public class Room {
         this.reservation = reservation;
     }
 
-
-    @Override
-    public String toString() {
-        return "Room{" +
-                "id=" + id +
-                ", roomType=" + roomType +
-                ", noBeds=" + noBeds +
-                ", price=" + price +
-                ", hotel=" + hotel +
-                ", reservation=" + reservation +
-                '}';
-    }
 }
 
 
