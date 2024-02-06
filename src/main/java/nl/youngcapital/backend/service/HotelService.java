@@ -24,6 +24,7 @@ public class HotelService {
     }
 
     public Optional<Hotel> getHotel(long id) {
+        System.out.println(id);
         return hotelRepository.findById(id);
     }
 
