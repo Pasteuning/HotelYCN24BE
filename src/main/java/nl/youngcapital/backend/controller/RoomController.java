@@ -15,7 +15,7 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-
+    
     @GetMapping("/allrooms")
     public Iterable<Room> getAllRooms() {
         Room room = new Room();
