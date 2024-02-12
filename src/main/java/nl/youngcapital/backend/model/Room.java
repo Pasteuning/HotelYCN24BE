@@ -16,6 +16,8 @@ public class Room {
     private RoomType roomType;
     @Column(nullable = false, length = 4)
     private int noBeds;
+    @Column(length = 1000)
+    private String description;
     @Column(nullable = false, length = 10)
     private double price;
     @ManyToOne
@@ -41,11 +43,19 @@ public class Room {
         this.noBeds = noBeds;
     }
 
-    public Double getPrice() {
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

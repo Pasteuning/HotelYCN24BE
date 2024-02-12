@@ -1,11 +1,9 @@
 package nl.youngcapital.backend.service;
 
-import nl.youngcapital.backend.model.Hotel;
-import nl.youngcapital.backend.model.Reservation;
-import nl.youngcapital.backend.model.ReservationDTO;
-import nl.youngcapital.backend.model.Room;
+import nl.youngcapital.backend.model.*;
 import nl.youngcapital.backend.repository.HotelRepository;
 import nl.youngcapital.backend.repository.ReservationRepository;
+import nl.youngcapital.backend.repository.ReviewRepository;
 import nl.youngcapital.backend.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -24,6 +22,8 @@ public class HotelService {
     private RoomRepository roomRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
 
 
@@ -87,6 +87,11 @@ public class HotelService {
         }
         return null;
     }
+
+    public Iterable<Review> getReviewsOfHotel(long id) {
+        return reviewRepository.getReviewsFromHotel(id);
+    }
+
 
     // Edit
     public boolean editHotel(long id, Hotel updatedHotel)  {

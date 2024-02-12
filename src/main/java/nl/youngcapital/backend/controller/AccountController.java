@@ -1,6 +1,7 @@
 package nl.youngcapital.backend.controller;
 
 import nl.youngcapital.backend.model.Account;
+import nl.youngcapital.backend.model.AccountDTO;
 import nl.youngcapital.backend.model.Review;
 import nl.youngcapital.backend.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,13 @@ public class AccountController {
 
     // Create
     @PostMapping("/create-account/{userId}")
-    public boolean createAccount(@PathVariable ("userId") long userId, @RequestBody Account account) {
+    public AccountService.Status createAccount(@PathVariable ("userId") long userId, @RequestBody Account account) {
         return accountService.createAccount(userId, account);
+    }
+
+    @PostMapping("/login")
+    public AccountService.Status login(@RequestBody AccountDTO accountDTO) {
+        return accountService.login(accountDTO);
     }
 
 
@@ -42,14 +48,14 @@ public class AccountController {
 
     // Edit
     @PutMapping("/account/{id}/change-password")
-    public boolean changePassword(@PathVariable ("id") long id, @RequestBody String newPassword) {
+    public AccountService.Status changePassword(@PathVariable ("id") long id, @RequestBody String newPassword) {
         return accountService.changePassword(id, newPassword);
     }
 
 
     // Delete
     @DeleteMapping("/delete-account/{id}")
-    public boolean deleteAccount(@PathVariable ("id") long id) {
+    public AccountService.Status deleteAccount(@PathVariable ("id") long id) {
         return accountService.deleteAccount(id);
     }
 
