@@ -15,10 +15,11 @@ public class UserService {
 
 
     // Create
-    public User createUser (User User){
-        userRepository.save(User);
-        System.out.println("User successfully created: \n" + User);
-        return User;
+    public User createUser (User user){
+        user.setEmail(user.getEmail().toLowerCase());
+        userRepository.save(user);
+        System.out.println("User successfully created on Id: " + user.getId());
+        return user;
     }
 
 

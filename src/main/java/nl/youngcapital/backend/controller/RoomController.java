@@ -43,7 +43,7 @@ public class RoomController {
 
     // Edit
     @PutMapping("/editroom/{id}")
-    public Room editRoom (@PathVariable ("id") long id, @RequestBody Room updatedRoom, @RequestParam long hotelId){
+    public boolean editRoom (@PathVariable ("id") long id, @RequestBody Room updatedRoom, @RequestParam long hotelId){
         return roomService.editRoom(id, updatedRoom, hotelId);
     }
 

@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -29,19 +30,19 @@ public class RoomService {
 
     // Create
     public Room createRoom (Room room, long hotelId) {
-        //Koppelt een hotel aan een kamer indien het hotel bestaat. Anders blijft hotel null
-        if (hotelRepository.findById(hotelId).isPresent()) {
-            Hotel hotel = hotelRepository.findById(hotelId).get();
+        try {
+            Hotel hotel = hotelRepository.findById(hotelId).orElseThrow();
             room.setHotel(hotel);
             roomRepository.save(room);
-            System.out.println("Room successfully created \n" + room);
-            System.out.println("Assigned to hotel: \n" + hotel);
+            System.out.println("Room successfully created on Id: " + room.getId());
             return room;
-        } else {
-            System.out.println("Hotel not found for hotelId: " + hotelId);
-            System.out.println("Room not saved. Returning null.");
-            return null;
+        } catch (NoSuchElementException e) {
+            System.err.println("Failed to create room. Cannot find hotel on Id: " + hotelId);
+        } catch (Exception e) {
+            System.err.println("Error while creating room");
+            System.err.println(e.getMessage());
         }
+        return null;
     }
 
 
@@ -56,25 +57,33 @@ public class RoomService {
 
 
     // Edit
-    public Room editRoom(long id, Room updatedRoom, long hotelId) {
+    public boolean editRoom(long id, Room updatedRoom, long hotelId) {
+        try {
+            Room room = roomRepository.findById(id)
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find room on Id: " + id));
+            Hotel hotel = hotelRepository.findById(hotelId)
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find hotel on Id: " + hotelId));
 
-        Room room = roomRepository.findById(id).orElseThrow();
-        if (updatedRoom.getRoomType() != null) {
-            room.setRoomType(updatedRoom.getRoomType());
-        }
-        if (updatedRoom.getNoBeds() != 0) {
-            room.setNoBeds(updatedRoom.getNoBeds());
-        }
-        if (updatedRoom.getPrice() != null) {
+            if (updatedRoom.getRoomType() != null) {
+                room.setRoomType(updatedRoom.getRoomType());
+            }
+            if (updatedRoom.getNoBeds() != 0) {
+                room.setNoBeds(updatedRoom.getNoBeds());
+            }
+            room.setDescription(updatedRoom.getDescription());
             room.setPrice(updatedRoom.getPrice());
-        }
-        if (hotelRepository.findById(hotelId).isPresent()){
-            Hotel hotel = hotelRepository.findById(hotelId).get();
             room.setHotel(hotel);
-        }
 
-        roomRepository.save(room);
-        return room;
+            roomRepository.save(room);
+            return true;
+
+        } catch (NoSuchElementException e) {
+            System.err.println("Failed to edit room. " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error while changing password");
+            System.err.println(e.getMessage());
+        }
+        return false;
     }
 
 
