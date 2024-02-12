@@ -13,7 +13,6 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     private RoomType roomType;
     @Column(nullable = false, length = 4)
     private int noBeds;

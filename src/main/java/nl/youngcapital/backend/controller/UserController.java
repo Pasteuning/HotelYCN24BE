@@ -13,29 +13,37 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
+
+    // Create
+    @PostMapping("/createuser")
+    public User createUser (@RequestBody User User) {
+        return userService.createUser(User);
+    }
+
+
+    // Read
     @GetMapping("/allusers")
     public Iterable<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/user/{id}")
-    public Optional<User> getUser(@PathVariable long id) {
+    public Optional<User> getUser(@PathVariable ("id") long id) {
         return userService.getUser(id);
     }
 
-    @PostMapping("/createuser")
-    public User createUser (@RequestBody User User) {
-        return userService.createUser(User);
-    }
 
-    @GetMapping ("/deleteuser/{id}")
-    public void deleteUser(@PathVariable long id) {
-        userService.deleteUser(id);
-    }
-
-    @PostMapping ("/edituser/{id}")
-    public User editUser (@PathVariable long id, @RequestBody User updatedUser) {
+    // Edit
+    @PutMapping ("/edituser/{id}")
+    public User editUser (@PathVariable ("id") long id, @RequestBody User updatedUser) {
         return userService.editUser(id, updatedUser);
+    }
 
+
+    // Delete
+    @DeleteMapping ("/deleteuser/{id}")
+    public void deleteUser(@PathVariable ("id") long id) {
+        userService.deleteUser(id);
     }
 }

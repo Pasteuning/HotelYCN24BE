@@ -15,44 +15,42 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-    
+
+
+    // Create
+    @PostMapping("/createroom")
+    public Room createRoom (@RequestBody Room room, @RequestParam long hotelId){
+        return roomService.createRoom(room, hotelId);
+    }
+
+
+    // Read
     @GetMapping("/allrooms")
     public Iterable<Room> getAllRooms() {
-        Room room = new Room();
         return roomService.getAllRooms();
     }
 
     @GetMapping("/room/{id}")
-    public Optional<Room> getRoom(@PathVariable long id){
+    public Optional<Room> getRoom(@PathVariable ("id") long id){
         return roomService.getRoom(id);
     }
 
     @GetMapping("/searchrooms/{hotelId}")
-    public Iterable<RoomDTO> searchRooms(@PathVariable long hotelId, @RequestParam LocalDate cid, @RequestParam LocalDate cod, @RequestParam int adults, @RequestParam int children) {
-        System.out.println("Received: ");
-        System.out.println("HotelId: " + hotelId +
-                ", Check-in: " + cid +
-                ", Check-out: " + cod +
-                ", Adults: " + adults +
-                ", Children: " + children);
+    public Iterable<RoomDTO> searchRooms(@PathVariable ("hotelId") long hotelId, @RequestParam LocalDate cid, @RequestParam LocalDate cod, @RequestParam int adults, @RequestParam int children) {
         return roomService.searchRooms(hotelId, cid, cod, adults, children);
     }
 
-    @PostMapping("/createroom")
-    public Room createRoom (@RequestBody Room room, @RequestParam long hotelId){
-        System.out.println("Received: " + room);
-        System.out.println("Received hotel id: " + hotelId);
-        return roomService.createRoom(room, hotelId);
-    }
 
-    @GetMapping ("/deleteroom/{id}")
-    public void deleteRoom(@PathVariable long id){
-        roomService.deleteRoom(id);
-    }
-
-    @PostMapping("/editroom/{id}")
-    public Room editRoom (@PathVariable long id, @RequestBody Room updatedRoom, @RequestParam long hotelId){
+    // Edit
+    @PutMapping("/editroom/{id}")
+    public Room editRoom (@PathVariable ("id") long id, @RequestBody Room updatedRoom, @RequestParam long hotelId){
         return roomService.editRoom(id, updatedRoom, hotelId);
     }
 
+
+    // Delete
+    @DeleteMapping ("/deleteroom/{id}")
+    public void deleteRoom(@PathVariable ("id") long id){
+        roomService.deleteRoom(id);
+    }
 }

@@ -1,6 +1,7 @@
 package nl.youngcapital.backend.service;
 
 import nl.youngcapital.backend.model.Hotel;
+import nl.youngcapital.backend.model.Reservation;
 import nl.youngcapital.backend.model.Room;
 import nl.youngcapital.backend.model.RoomDTO;
 import nl.youngcapital.backend.repository.HotelRepository;
@@ -25,7 +26,8 @@ public class RoomService {
     private ReservationRepository reservationRepository;
 
 
-    // CRUD Methoden
+
+    // Create
     public Room createRoom (Room room, long hotelId) {
         //Koppelt een hotel aan een kamer indien het hotel bestaat. Anders blijft hotel null
         if (hotelRepository.findById(hotelId).isPresent()) {
@@ -42,6 +44,8 @@ public class RoomService {
         }
     }
 
+
+    // Read
     public Iterable<Room> getAllRooms() {
         return roomRepository.findAll();
     }
@@ -50,6 +54,8 @@ public class RoomService {
         return roomRepository.findById(id);
     }
 
+
+    // Edit
     public Room editRoom(long id, Room updatedRoom, long hotelId) {
 
         Room room = roomRepository.findById(id).orElseThrow();
@@ -71,6 +77,8 @@ public class RoomService {
         return room;
     }
 
+
+    // Delete
     public void deleteRoom (long id){
         roomRepository.deleteById(id);
     }
@@ -85,7 +93,7 @@ public class RoomService {
             // Zoekt naar geschikte kamers op basis van aantal bedden
             List<Room> suitableRooms = new ArrayList<>();
             for (int i = 0; i < hotel.getRooms().size(); i++) {
-                if (hotel.getRooms().get(i).getNoBeds() >= adults) {
+                if ((adults + children) <= hotel.getRooms().get(i).getNoBeds()) {
                     suitableRooms.add(hotel.getRooms().get(i));
                 }
             }
@@ -104,26 +112,38 @@ public class RoomService {
                     availableRooms.add(room);
                 }
             }
+            if (availableRooms.isEmpty()) {
+                System.out.println("No available rooms found");
+            }
             return availableRooms;
         } else return null;
     }
 
     private boolean checkAvailability(Room suitableRoom, LocalDate cid, LocalDate cod) {
         // Gaat alle bestaande reserveringen per geschikte kamer af 
-        // Kijkt of er overlap is wat betreft ciDate en coDate
-        // Indien de boolean bij elke reservering true blijft, komt het in de availableRooms List terecht
+        // Kijkt of er overlap is wat betreft ciDate en coDate tussen zoekopdracht en bestaande reserveringen
+        // Indien de boolean bij elke reservering true blijft en de reservering, komt het in de availableRooms List terecht
         boolean available = true;
-        for (int j = 0; j < suitableRoom.getReservation().size(); j++) {
-            if (suitableRoom.getReservation().get(j).getCiDate().isBefore(cid) &&
-                    suitableRoom.getReservation().get(j).getCoDate().isAfter(cid)) {
+        for (int i = 0; i < suitableRoom.getReservation().size(); i++) {
+            boolean cancelled = suitableRoom.getReservation().get(i).getStatus() == Reservation.Status.CANCELLED;
+
+            // Stuurt available false als reservering overlapt en de status van de reservering niet CANCELLED is
+            if (suitableRoom.getReservation().get(i).getCiDate().isBefore(cid) &&
+                    suitableRoom.getReservation().get(i).getCoDate().isAfter(cid) &&
+                    !cancelled) {
                 available = false;
-            } else if (suitableRoom.getReservation().get(j).getCiDate().isBefore(cod) &&
-                    suitableRoom.getReservation().get(j).getCoDate().isAfter(cod)) {
+                break;
+            } else if (suitableRoom.getReservation().get(i).getCiDate().isBefore(cod) &&
+                    suitableRoom.getReservation().get(i).getCoDate().isAfter(cod) &&
+                    !cancelled) {
                 available = false;
-            } else if (suitableRoom.getReservation().get(j).getCiDate().isAfter(cid) &&
-                    suitableRoom.getReservation().get(j).getCoDate().isBefore(cod)) {
+                break;
+            } else if (suitableRoom.getReservation().get(i).getCiDate().isAfter(cid) &&
+                    suitableRoom.getReservation().get(i).getCoDate().isBefore(cod) &&
+                    !cancelled) {
                 available = false;
-            } 
+                break;
+            }
         }
         return available;
     }
