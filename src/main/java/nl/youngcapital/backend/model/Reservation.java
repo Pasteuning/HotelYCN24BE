@@ -3,11 +3,12 @@ package nl.youngcapital.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.awt.print.Book;
 import java.time.LocalDate;
 
 @Entity
 public class Reservation {
-    public enum Status { LOOKING, RESERVED, BOOKED }
+    public enum Status { RESERVED, BOOKED, CANCELLED }
 
 
     @Id
@@ -23,11 +24,15 @@ public class Reservation {
     private int children;
     @Column(nullable = false)
     private boolean surcharge;
-    private Status status = Status.LOOKING;
+    @Column(length = 500)
+    private String specialRequest;
+    private Status status = Status.RESERVED;
     @ManyToOne
     private Room room;
     @ManyToOne
     private User user;
+    @OneToOne
+    private Booking booking;
 
 
 
@@ -80,6 +85,14 @@ public class Reservation {
         this.surcharge = surcharge;
     }
 
+    public String getSpecialRequest() {
+        return specialRequest;
+    }
+
+    public void setSpecialRequest(String specialRequest) {
+        this.specialRequest = specialRequest;
+    }
+
     public Status getStatus() {
         return status;
     }
@@ -108,18 +121,11 @@ public class Reservation {
         this.user = user;
     }
 
+    public Booking getBooking() {
+        return booking;
+    }
 
-    @Override
-    public String toString() {
-        return "Reservation{" +
-                ", ciDate=" + ciDate +
-                ", coDate=" + coDate +
-                ", adults=" + adults +
-                ", children=" + children +
-                ", surcharge=" + surcharge +
-                ", status=" + status +
-                ", room=" + room +
-                ", user=" + user +
-                '}';
+    public void setBooking(Booking booking) {
+        this.booking = booking;
     }
 }

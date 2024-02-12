@@ -14,6 +14,15 @@ public class UserService {
 
 
 
+    // Create
+    public User createUser (User User){
+        userRepository.save(User);
+        System.out.println("User successfully created: \n" + User);
+        return User;
+    }
+
+
+    // Read
     public Iterable<User> getAllUsers(){
         return userRepository.findAll();
     }
@@ -22,16 +31,8 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User createUser (User User){
-        userRepository.save(User);
-        System.out.println("User successfully created: \n" + User);
-        return User;
-    }
 
-    public void deleteUser (long id) {
-        userRepository.deleteById(id);
-    }
-
+    // Edit
     public User editUser(long id, User updatedUser)  {
         User User = userRepository.findById(id).orElseThrow();
         if (updatedUser.getFirstName() != null) {
@@ -67,5 +68,11 @@ public class UserService {
 
         userRepository.save(User);
         return User;
+    }
+
+
+    // Delete
+    public void deleteUser (long id) {
+        userRepository.deleteById(id);
     }
 }

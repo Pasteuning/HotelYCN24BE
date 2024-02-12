@@ -1,5 +1,6 @@
 package nl.youngcapital.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -33,6 +34,8 @@ public class User {
     private String phoneNumber;
     @OneToMany(mappedBy = "user")
     private List<Reservation> reservation = new ArrayList<>();
+    @OneToOne
+    private Account account;
 
 
 
@@ -130,5 +133,15 @@ public class User {
 
     public void setReservation(List<Reservation> reservation) {
         this.reservation = reservation;
+    }
+
+    @JsonIgnore
+    public Account getAccount() {
+        return account;
+    }
+
+    @JsonIgnore
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

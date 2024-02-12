@@ -22,8 +22,12 @@ public class Hotel {
     private String city;
     @Column(nullable = false,length = 80)
     private String country;
+    @Column(length = 800)
+    private String description;
     @OneToMany(mappedBy = "hotel")
     private List<Room> rooms = new ArrayList<>();
+    @OneToMany(mappedBy = "hotel")
+    private List<Review> reviews = new ArrayList<>();
 
 
 
@@ -83,6 +87,14 @@ public class Hotel {
         this.country = country;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public List<Room> getRooms() {
         return rooms;
     }
@@ -91,18 +103,12 @@ public class Hotel {
         this.rooms = room;
     }
 
-    @Override
-    public String toString() {
-        return "Hotel{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", street='" + street + '\'' +
-                ", houseNumber='" + houseNumber + '\'' +
-                ", zipCode='" + zipCode + '\'' +
-                ", city='" + city + '\'' +
-                ", country='" + country + '\'' +
-                ", rooms=" + rooms +
-                '}';
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }
 
