@@ -9,6 +9,7 @@ import nl.youngcapital.backend.repository.ReservationRepository;
 import nl.youngcapital.backend.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -26,6 +27,7 @@ public class RoomService {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    public enum Status { SUCCESS, FAILED};
 
 
     // Create
@@ -84,6 +86,35 @@ public class RoomService {
             System.err.println(e.getMessage());
         }
         return false;
+    }
+
+    public Status setRoomDescription(long hotelId, String roomType, String description) {
+        try {
+            Room.RoomType rtEnum = Room.RoomType.valueOf(roomType);
+
+            if (description == null) { description = ""; }
+
+            if (description.length() > 1000) {
+                System.err.println("Room description cannot contain more than 1000 characters");
+                return Status.FAILED;
+            }
+
+            if (hotelRepository.findById(hotelId).isPresent()) {
+                Iterable<Room> rooms = roomRepository.findByHotelIdAndRoomType(hotelId, rtEnum);
+
+                for (Room room : rooms) {
+                    room.setDescription(description);
+                }
+                roomRepository.saveAll(rooms);
+                System.out.println("Successfully set descriptions of room type " + rtEnum + " of hotel " + hotelId);
+                return Status.SUCCESS;
+            } else {
+                System.err.println("Failed to set description of rooms. Cannot find hotel on Id: " + hotelId);
+            }
+        } catch (IllegalArgumentException e) {
+                System.err.println("Failed to set description of rooms. Room type should be SINGLE, DOUBLE, or FAMILY");
+            }
+        return Status.FAILED;
     }
 
 

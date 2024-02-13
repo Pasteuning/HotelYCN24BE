@@ -1,17 +1,23 @@
 package nl.youngcapital.backend.service;
 
+import nl.youngcapital.backend.model.Reservation;
+import nl.youngcapital.backend.model.ReservationDTO;
 import nl.youngcapital.backend.model.User;
+import nl.youngcapital.backend.repository.ReservationRepository;
 import nl.youngcapital.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private ReservationRepository reservationRepository;
 
 
     // Create
@@ -30,6 +36,22 @@ public class UserService {
 
     public Optional<User> getUser(long id) {
         return userRepository.findById(id);
+    }
+
+    public Iterable<ReservationDTO> findReservationsOfUser(long id) {
+        List<ReservationDTO> dtoList = new ArrayList<>();
+
+        if (userRepository.existsById(id)) {
+            Iterable<Reservation> reservations = reservationRepository.findReservationsOfUser(id);
+            for (Reservation reservation : reservations){
+                dtoList.add(new ReservationDTO(reservation));
+            }
+            System.out.println("Returning list of reservations from user with Id: " + id);
+        }
+        else {
+            System.err.println("Failed to get reservations. Cannot find user on Id: " + id);
+        }
+        return dtoList;
     }
 
 

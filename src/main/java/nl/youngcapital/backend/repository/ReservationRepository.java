@@ -14,4 +14,7 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
             "JOIN room r on r.id = res.room_id " +
             "WHERE r.hotel_id = ?1", nativeQuery = true)
     Iterable<Reservation> findReservationsOfHotel(long id);
+
+    @Query(value = "SELECT * FROM reservation WHERE user_id = ?1", nativeQuery = true)
+    Iterable<Reservation> findReservationsOfUser(long id);
 }

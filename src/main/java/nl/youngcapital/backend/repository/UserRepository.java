@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<User, Long> {
 
     @Query(value = "SELECT * FROM user WHERE email = ?1 AND account_id IS NOT NULL", nativeQuery = true)
-    User checkIfAccountExists(String email);
+    User getAccountIdFromEmail(String email);
 
     User findByEmail(String email);
 }
