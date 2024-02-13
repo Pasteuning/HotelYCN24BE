@@ -47,6 +47,12 @@ public class RoomController {
         return roomService.editRoom(id, updatedRoom, hotelId);
     }
 
+    @PutMapping("/set-roomdescription/{hotelId}")
+    public RoomService.Status setRoomDescription(@PathVariable ("hotelId") long hotelId, @RequestParam String roomType, @RequestBody(required = false) String description) {
+        return roomService.setRoomDescription(hotelId, roomType, description);
+    }
+
+
 
     // Delete
     @DeleteMapping ("/deleteroom/{id}")

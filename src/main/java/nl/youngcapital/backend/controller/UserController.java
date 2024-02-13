@@ -1,5 +1,6 @@
 package nl.youngcapital.backend.controller;
 
+import nl.youngcapital.backend.model.ReservationDTO;
 import nl.youngcapital.backend.model.User;
 import nl.youngcapital.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,11 @@ public class UserController {
     @GetMapping("/user/{id}")
     public Optional<User> getUser(@PathVariable ("id") long id) {
         return userService.getUser(id);
+    }
+
+    @GetMapping("/{id}/reservations")
+    public Iterable<ReservationDTO> findReservationsOfUser(@PathVariable ("id") long id) {
+        return userService.findReservationsOfUser(id);
     }
 
 

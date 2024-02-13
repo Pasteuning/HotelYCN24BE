@@ -27,7 +27,7 @@ public class AccountService {
     public Status createAccount(long userId, Account account) {
         try {
             User user = userRepository.findById(userId).orElseThrow();
-            if (userRepository.checkIfAccountExists(user.getEmail()) != null) {
+            if (userRepository.getAccountIdFromEmail(user.getEmail()) != null) {
                 return Status.ACCOUNT_ALREADY_EXISTS;
             } else {
                 user.setAccount(account);
@@ -149,5 +149,25 @@ public class AccountService {
             System.err.println(e.getMessage());
         }
         return Status.FAILED;
+    }
+
+
+    public SessionDTO getSessionDTO(String email){
+        try {
+            User user = userRepository.getAccountIdFromEmail(email);
+            if (user != null) {
+                System.out.println("Returning session DTO of email: " + email);
+                return new SessionDTO(user.getId(), user.getAccount().getId());
+            } else {
+                System.err.println("Account doesn't exist on email: " + email);
+                return null;
+            }
+        } catch (NoSuchElementException e) {
+            System.err.println("Failed to login. Cannot find email in database: " + email);
+        } catch (Exception e) {
+            System.err.println("Error while returning session DTO");
+            System.err.println(e.getMessage());
+        }
+        return null;
     }
 }

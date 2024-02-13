@@ -3,6 +3,7 @@ package nl.youngcapital.backend.controller;
 import nl.youngcapital.backend.model.Account;
 import nl.youngcapital.backend.model.AccountDTO;
 import nl.youngcapital.backend.model.Review;
+import nl.youngcapital.backend.model.SessionDTO;
 import nl.youngcapital.backend.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -59,7 +60,10 @@ public class AccountController {
         return accountService.deleteAccount(id);
     }
 
-
+    @GetMapping("/get-sessiondto")
+    public SessionDTO getSessionDTO(@RequestParam String email) {
+        return accountService.getSessionDTO(email);
+    }
 
 }
 

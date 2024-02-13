@@ -25,13 +25,24 @@ public class ReviewService {
     @Autowired
     private AccountRepository accountRepository;
 
+    public enum Status { SUCCESS, FAILED, TOO_MANY_CHARACTERS, TOO_MANY_STARS}
 
     
     // Create
-    public boolean createReview(long hotelId, long accountId, Review review) {
+    public Status createReview(long hotelId, long accountId, Review review) {
+        if (review.getRating() > 5) {
+            System.err.println("Rating cannot be more than 5 stars");
+            return Status.TOO_MANY_STARS;
+        } else if (review.getComment().length() > 1000){
+            System.err.println("Comment cannot contain more than 1000 characters");
+            return Status.TOO_MANY_CHARACTERS;
+        }
+
         try {
-            Hotel hotel = hotelRepository.findById(hotelId).orElseThrow();
-            Account account = accountRepository.findById(accountId).orElseThrow();
+            Hotel hotel = hotelRepository.findById(hotelId)
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find hotel with Id: " + hotelId));
+            Account account = accountRepository.findById(accountId)
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find account with Id: " + accountId));
 
             review.setDate(LocalDateTime.now());
             review.setAccount(account);
@@ -39,13 +50,13 @@ public class ReviewService {
 
             reviewRepository.save(review);
             System.out.println("Successfully created review on Id: " + review.getId());
-            return true;
+            return Status.SUCCESS;
         } catch (NoSuchElementException e) {
             System.err.println("Failed to create review. " + e.getMessage());
-            return false;
+            return Status.FAILED;
         } catch (DataAccessException e) {
             System.err.println("Failed to save review to the database: " + e.getMessage());
-            return false;
+            return Status.FAILED;
         }
     }
 
@@ -67,14 +78,14 @@ public class ReviewService {
 
 
     // Edit
-    public boolean editReview(long id, Review updatedReview) {
+    public Status editReview(long id, Review updatedReview) {
         try {
             Review review = reviewRepository.findById(id).orElseThrow();
             review.setComment(updatedReview.getComment());
             review.setRating(updatedReview.getRating());
             reviewRepository.save(review);
             System.out.println("Successfully updated review with Id: " + id);
-            return true;
+            return Status.SUCCESS;
         } catch (NoSuchElementException e) {
             System.err.println("Failed to edit password. Cannot find review on Id: " + id);
             System.err.println(e.getMessage());
@@ -82,17 +93,17 @@ public class ReviewService {
             System.err.println("Failed to edit review with Id: " + id);
             System.err.println(e.getMessage());
         }
-        return false;
+        return Status.FAILED;
     }
 
 
     // Delete
-    public boolean deleteReview(long id) {
+    public Status deleteReview(long id) {
         if (reviewRepository.findById(id).isPresent()) {
             try {
                 reviewRepository.deleteById(id);
                 System.out.println("Successfully deleted review with Id: " + id);
-                return true;
+                return Status.SUCCESS;
             } catch (Exception e) {
                 System.err.println("Failed to delete review on Id: " + id);
                 System.err.println(e.getMessage());
@@ -100,7 +111,7 @@ public class ReviewService {
         } else {
             System.err.println("Failed to delete review. Cannot find review on Id: " + id);
         }
-        return false;
+        return Status.FAILED;
     }
 
 
