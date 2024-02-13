@@ -46,6 +46,11 @@ public class AccountController {
         return accountService.getReviewsFromAccount(id);
     }
 
+    @GetMapping("/get-sessiondto")
+    public SessionDTO getSessionDTO(@RequestBody String email) {
+        return accountService.getSessionDTO(email);
+    }
+
 
     // Edit
     @PutMapping("/account/{id}/change-password")
@@ -60,10 +65,7 @@ public class AccountController {
         return accountService.deleteAccount(id);
     }
 
-    @GetMapping("/get-sessiondto")
-    public SessionDTO getSessionDTO(@RequestParam String email) {
-        return accountService.getSessionDTO(email);
-    }
+
 
 }
 
