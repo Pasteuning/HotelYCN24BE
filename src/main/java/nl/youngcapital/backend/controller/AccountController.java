@@ -1,5 +1,8 @@
 package nl.youngcapital.backend.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import nl.youngcapital.backend.model.Account;
 import nl.youngcapital.backend.model.AccountDTO;
 import nl.youngcapital.backend.model.Review;
@@ -24,9 +27,10 @@ public class AccountController {
         return accountService.createAccount(userId, account);
     }
 
+
     @PostMapping("/login")
-    public AccountService.Status login(@RequestBody AccountDTO accountDTO) {
-        return accountService.login(accountDTO);
+    public String login(@RequestBody AccountDTO accountDTO, HttpSession session) {
+        return accountService.login(accountDTO, session);
     }
 
 
@@ -47,9 +51,20 @@ public class AccountController {
     }
 
     @GetMapping("/get-sessiondto")
-    public SessionDTO getSessionDTO(@RequestBody String email) {
-        return accountService.getSessionDTO(email);
+    public SessionDTO getSessionDTO(HttpSession request) {
+        return accountService.getSessionDTO(request);
     }
+
+
+
+    @GetMapping("/make-review")
+    public String makeReview(HttpServletRequest request) {
+        return accountService.makeReview(request);
+    }
+
+
+
+
 
 
     // Edit

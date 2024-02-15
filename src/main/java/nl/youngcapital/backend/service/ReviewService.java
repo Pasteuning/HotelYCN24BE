@@ -1,9 +1,7 @@
 package nl.youngcapital.backend.service;
 
-import nl.youngcapital.backend.model.Account;
-import nl.youngcapital.backend.model.Hotel;
-import nl.youngcapital.backend.model.Review;
-import nl.youngcapital.backend.model.User;
+import jakarta.servlet.http.HttpServletRequest;
+import nl.youngcapital.backend.model.*;
 import nl.youngcapital.backend.repository.AccountRepository;
 import nl.youngcapital.backend.repository.HotelRepository;
 import nl.youngcapital.backend.repository.ReviewRepository;
@@ -29,7 +27,11 @@ public class ReviewService {
 
     
     // Create
-    public Status createReview(long hotelId, long accountId, Review review) {
+    public Status createReview(long hotelId, Review review, HttpServletRequest request) {
+
+        SessionDTO sessionDTO = (SessionDTO) request.getSession().getAttribute("sessionDTO");
+
+
         if (review.getRating() > 5) {
             System.err.println("Rating cannot be more than 5 stars");
             return Status.TOO_MANY_STARS;
@@ -41,8 +43,8 @@ public class ReviewService {
         try {
             Hotel hotel = hotelRepository.findById(hotelId)
                     .orElseThrow(() -> new NoSuchElementException("Cannot find hotel with Id: " + hotelId));
-            Account account = accountRepository.findById(accountId)
-                    .orElseThrow(() -> new NoSuchElementException("Cannot find account with Id: " + accountId));
+            Account account = accountRepository.findById(sessionDTO.getAccountId())
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find account with Id: " + sessionDTO.getAccountId()));
 
             review.setDate(LocalDateTime.now());
             review.setAccount(account);

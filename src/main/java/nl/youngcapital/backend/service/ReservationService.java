@@ -46,7 +46,7 @@ public class ReservationService {
             //zet surcharge op true indien er kinderen komen
             reservation.setSurcharge(reservationDTO.getReservation().getChildren() != 0);
             reservationRepository.save(reservation);
-            System.out.println("Reservation successfully created: \n" + reservation);
+            System.out.println("Successfully created reservation on Id: " + reservation.getId());
             return true;
         } catch (NoSuchElementException e) {
             System.err.println("Failed to create reservation. " + e.getMessage());

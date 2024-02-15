@@ -1,9 +1,12 @@
 package nl.youngcapital.backend.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import nl.youngcapital.backend.model.*;
 import nl.youngcapital.backend.repository.AccountRepository;
 import nl.youngcapital.backend.repository.ReviewRepository;
 import nl.youngcapital.backend.repository.UserRepository;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -79,6 +82,8 @@ public class AccountService {
     }
 
 
+
+
     // Edit
     public Status changePassword(long id, String newPassword) {
         try {
@@ -127,20 +132,88 @@ public class AccountService {
 
 
     // Andere methodes
-    public Status login(AccountDTO accountDTO){
+//    public Status login(AccountDTO accountDTO){
+//        try {
+//            User user = userRepository.findByEmail(accountDTO.getEmail());
+//            if (user != null && accountRepository.findById(user.getAccount().getId()).isPresent()) {
+//                Account account = accountRepository.findById(user.getAccount().getId()).orElseThrow();
+//                if (accountDTO.getPassword().equals(account.getPassword())) {
+//                    System.out.println("Password is correct");
+//                    return Status.SUCCESS;
+//                } else {
+//                    System.err.println("Password is incorrect");
+//                }
+//            } else {
+//                System.err.println("Account doesn't exist on email: " + accountDTO.getEmail());
+//                return Status.ACCOUNT_DOES_NOT_EXIST;
+//            }
+//        } catch (NoSuchElementException e) {
+//            System.err.println("Failed to login. Cannot find email in database: " + accountDTO.getEmail());
+//        } catch (Exception e) {
+//            System.err.println("Error while logging in");
+//            System.err.println(e.getMessage());
+//        }
+//        return Status.FAILED;
+//    }
+
+//    public String login(AccountDTO accountDTO, HttpSession session){
+//        try {
+//            User user = userRepository.findByEmail(accountDTO.getEmail());
+//
+//            if (user != null && accountRepository.findById(user.getAccount().getId()).isPresent()) {
+//                Account account = accountRepository.findById(user.getAccount().getId()).orElseThrow();
+//
+//                if (accountDTO.getPassword().equals(account.getPassword())) {
+//                    System.out.println("Password is correct. ");
+//                    SessionDTO sessionDTO =  new SessionDTO(user.getId(), account.getId());
+//                    session.setAttribute("sessionDTO", sessionDTO);
+//                    return "redirect:/user_account";
+//                } else {
+//                    System.err.println("Password is incorrect");
+//                }
+//
+//            } else {
+//                System.err.println("Account doesn't exist on email: " + accountDTO.getEmail());
+//                return "Account doesn't exist";
+//            }
+//        } catch (NoSuchElementException e) {
+//            System.err.println("Failed to login. Cannot find email in database: " + accountDTO.getEmail());
+//        } catch (Exception e) {
+//            System.err.println("Error while logging in");
+//            System.err.println(e.getMessage());
+//        }
+//        return "Failed to login";
+//    }
+
+    public String login(AccountDTO accountDTO, HttpSession session){
         try {
             User user = userRepository.findByEmail(accountDTO.getEmail());
+
             if (user != null && accountRepository.findById(user.getAccount().getId()).isPresent()) {
                 Account account = accountRepository.findById(user.getAccount().getId()).orElseThrow();
+
                 if (accountDTO.getPassword().equals(account.getPassword())) {
-                    System.out.println("Password is correct");
-                    return Status.SUCCESS;
+                    System.out.println("Password is correct. ");
+                    SessionDTO sessionDTO =  new SessionDTO(user.getId(), account.getId());
+
+                    session.setAttribute("sessionDTO", sessionDTO);
+
+                    System.out.println(sessionDTO.getAccountId());
+                    System.out.println(sessionDTO.getUserId());
+                    System.out.println(session);
+
+                    if (account.getHotelId() == -100) {
+                        return "/user_account";
+                    } else {
+                        return "/manager";
+                    }
                 } else {
                     System.err.println("Password is incorrect");
                 }
+
             } else {
                 System.err.println("Account doesn't exist on email: " + accountDTO.getEmail());
-                return Status.ACCOUNT_DOES_NOT_EXIST;
+                return "Account doesn't exist";
             }
         } catch (NoSuchElementException e) {
             System.err.println("Failed to login. Cannot find email in database: " + accountDTO.getEmail());
@@ -148,26 +221,45 @@ public class AccountService {
             System.err.println("Error while logging in");
             System.err.println(e.getMessage());
         }
-        return Status.FAILED;
+        return "Failed to login";
     }
 
 
-    public SessionDTO getSessionDTO(String email){
-        try {
-            User user = userRepository.getAccountIdFromEmail(email);
-            if (user != null) {
-                System.out.println("Returning session DTO of email: " + email);
-                return new SessionDTO(user.getId(), user.getAccount().getId());
-            } else {
-                System.err.println("Account doesn't exist on email: " + email);
-                return null;
-            }
-        } catch (NoSuchElementException e) {
-            System.err.println("Failed to login. Cannot find email in database: " + email);
-        } catch (Exception e) {
-            System.err.println("Error while returning session DTO");
-            System.err.println(e.getMessage());
-        }
-        return null;
+    public SessionDTO getSessionDTO(HttpSession session) {
+        System.out.println("Get session DTO: " + session.getAttribute("sessionDTO"));
+        return (SessionDTO) session.getAttribute("sessionDTO");
     }
+
+
+
+
+
+
+
+    public String makeReview(HttpServletRequest request) {
+        SessionDTO sessionDTO = (SessionDTO) request.getSession().getAttribute("sessionDTO");
+        return "make_review";
+    }
+
+
+
+
+//    public SessionDTO getSessionDTO(String email){
+//        try {
+//            User user = userRepository.getAccountIdFromEmail(email);
+//            if (user != null) {
+//                System.out.println("Returning session DTO of email: " + email);
+//                return new SessionDTO(user.getId(), user.getAccount().getId());
+//            } else {
+//                System.err.println("Account doesn't exist on email: " + email);
+//                return null;
+//            }
+//        } catch (NoSuchElementException e) {
+//            System.err.println("Failed to login. Cannot find email in database: " + email);
+//        } catch (Exception e) {
+//            System.err.println("Error while returning session DTO");
+//            System.err.println(e.getMessage());
+//        }
+//        return null;
+//    }
 }

@@ -1,8 +1,10 @@
 package nl.youngcapital.backend.model;
 
-public class SessionDTO {
-    private long userId;
-    private long accountId;
+import java.io.Serializable;
+
+public class SessionDTO implements Serializable {
+    private final long userId;
+    private final long accountId;
 
 
     public SessionDTO(long userId, long accountId) {
@@ -15,15 +17,8 @@ public class SessionDTO {
         return userId;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
     public long getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
-    }
 }

@@ -35,8 +35,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}/reservations")
-    public Iterable<ReservationDTO> findReservationsOfUser(@PathVariable ("id") long id) {
-        return userService.findReservationsOfUser(id);
+    public Iterable<ReservationDTO> findReservationsOfUser(@PathVariable ("id") long id, @RequestParam(required = false) String pastOrFuture) {
+        // Voer als parameter "past" in of "future". default = future
+        return userService.findReservationsOfUser(id, pastOrFuture);
     }
 
 

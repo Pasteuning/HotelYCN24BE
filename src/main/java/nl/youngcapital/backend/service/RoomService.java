@@ -36,7 +36,7 @@ public class RoomService {
             Hotel hotel = hotelRepository.findById(hotelId).orElseThrow();
             room.setHotel(hotel);
             roomRepository.save(room);
-            System.out.println("Room successfully created on Id: " + room.getId());
+            System.out.println("Successfully created room on Id: " + room.getId());
             return room;
         } catch (NoSuchElementException e) {
             System.err.println("Failed to create room. Cannot find hotel on Id: " + hotelId);

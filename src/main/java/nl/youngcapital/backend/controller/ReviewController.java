@@ -1,5 +1,6 @@
 package nl.youngcapital.backend.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import nl.youngcapital.backend.model.Review;
 import nl.youngcapital.backend.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,16 @@ public class ReviewController {
 
 
     // Create
-    @PostMapping("/create-review/{hotelId}/{accountId}")
-    public ReviewService.Status createReview(@PathVariable ("hotelId") long hotelId, @PathVariable ("accountId") long accountId, @RequestBody Review review) {
-        return reviewService.createReview(hotelId, accountId, review);
+//    @PostMapping("/create-review/{hotelId}/{accountId}")
+//    public ReviewService.Status createReview(@PathVariable ("hotelId") long hotelId, @PathVariable ("accountId") long accountId, @RequestBody Review review) {
+//        return reviewService.createReview(hotelId, accountId, review);
+//    }
+
+    @PostMapping("/create-review/{hotelId}/")
+    public ReviewService.Status createReview(@PathVariable ("hotelId") long hotelId, @RequestBody Review review, HttpServletRequest request) {
+        return reviewService.createReview(hotelId, review, request);
     }
+
 
 
     // Read

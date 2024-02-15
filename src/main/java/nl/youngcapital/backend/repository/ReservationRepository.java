@@ -15,6 +15,9 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
             "WHERE r.hotel_id = ?1", nativeQuery = true)
     Iterable<Reservation> findReservationsOfHotel(long id);
 
-    @Query(value = "SELECT * FROM reservation WHERE user_id = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM reservation WHERE user_id = ?1 AND ci_date >= CURRENT_DATE", nativeQuery = true)
     Iterable<Reservation> findReservationsOfUser(long id);
+
+    @Query(value = "SELECT * FROM reservation WHERE user_id = ?1 AND ci_date < CURRENT_DATE", nativeQuery = true)
+    Iterable<Reservation> findPastReservationsOfUser(long id);
 }
