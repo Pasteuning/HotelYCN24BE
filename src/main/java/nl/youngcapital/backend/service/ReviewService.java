@@ -1,20 +1,15 @@
 package nl.youngcapital.backend.service;
 
-import nl.youngcapital.backend.model.Account;
-import nl.youngcapital.backend.model.Hotel;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import nl.youngcapital.backend.model.Review;
-import nl.youngcapital.backend.model.User;
 import nl.youngcapital.backend.repository.AccountRepository;
 import nl.youngcapital.backend.repository.HotelRepository;
 import nl.youngcapital.backend.repository.ReviewRepository;
-import nl.youngcapital.backend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class ReviewService {
@@ -29,36 +24,40 @@ public class ReviewService {
 
     
     // Create
-    public Status createReview(long hotelId, long accountId, Review review) {
-        if (review.getRating() > 5) {
-            System.err.println("Rating cannot be more than 5 stars");
-            return Status.TOO_MANY_STARS;
-        } else if (review.getComment().length() > 1000){
-            System.err.println("Comment cannot contain more than 1000 characters");
-            return Status.TOO_MANY_CHARACTERS;
-        }
-
-        try {
-            Hotel hotel = hotelRepository.findById(hotelId)
-                    .orElseThrow(() -> new NoSuchElementException("Cannot find hotel with Id: " + hotelId));
-            Account account = accountRepository.findById(accountId)
-                    .orElseThrow(() -> new NoSuchElementException("Cannot find account with Id: " + accountId));
-
-            review.setDate(LocalDateTime.now());
-            review.setAccount(account);
-            review.setHotel(hotel);
-
-            reviewRepository.save(review);
-            System.out.println("Successfully created review on Id: " + review.getId());
-            return Status.SUCCESS;
-        } catch (NoSuchElementException e) {
-            System.err.println("Failed to create review. " + e.getMessage());
-            return Status.FAILED;
-        } catch (DataAccessException e) {
-            System.err.println("Failed to save review to the database: " + e.getMessage());
-            return Status.FAILED;
-        }
+    public void createReview(Review review) {
+    	reviewRepository.save(review);
     }
+    	
+    	// welk user is er
+
+//        if (review.getRating() > 5) {
+//            System.err.println("Rating cannot be more than 5 stars");
+//            return Status.TOO_MANY_STARS;
+//        } else if (review.getComment().length() > 1000){
+//            System.err.println("Comment cannot contain more than 1000 characters");
+//            return Status.TOO_MANY_CHARACTERS;
+//        }
+//
+//        try {
+//            Hotel hotel = hotelRepository.findById(hotelId)
+//                    .orElseThrow(() -> new NoSuchElementException("Cannot find hotel with Id: " + hotelId));
+//            Account account = accountRepository.findById(sessionDTO.getAccountId())
+//                    .orElseThrow(() -> new NoSuchElementException("Cannot find account with Id: " + sessionDTO.getAccountId()));
+//
+//            review.setDate(LocalDateTime.now());
+//            review.setAccount(account);
+//            review.setHotel(hotel);
+//
+//            reviewRepository.save(review);
+//            System.out.println("Successfully created review on Id: " + review.getId());
+//            return Status.SUCCESS;
+//        } catch (NoSuchElementException e) {
+//            System.err.println("Failed to create review. " + e.getMessage());
+//            return Status.FAILED;
+//        } catch (DataAccessException e) {
+//            System.err.println("Failed to save review to the database: " + e.getMessage());
+//            return Status.FAILED;
+//        }
 
 
     // Read

@@ -1,15 +1,19 @@
 package nl.youngcapital.backend.service;
 
-import nl.youngcapital.backend.model.*;
-import nl.youngcapital.backend.repository.AccountRepository;
-import nl.youngcapital.backend.repository.ReviewRepository;
-import nl.youngcapital.backend.repository.UserRepository;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Random;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import nl.youngcapital.backend.model.Account;
+import nl.youngcapital.backend.model.Review;
+import nl.youngcapital.backend.model.User;
+import nl.youngcapital.backend.repository.AccountRepository;
+import nl.youngcapital.backend.repository.ReviewRepository;
+import nl.youngcapital.backend.repository.UserRepository;
 
 @Service
 public class AccountService {
@@ -68,16 +72,6 @@ public class AccountService {
 
     }
 
-    public Iterable<Review> getReviewsFromAccount(long id) {
-        try {
-            Account account = accountRepository.findById(id).orElseThrow();
-            return account.getReviews();
-        } catch (NoSuchElementException e) {
-            System.err.println("Failed to get reviews. Cannot find account on Id: " + id);
-        }
-        return null;
-    }
-
 
     // Edit
     public Status changePassword(long id, String newPassword) {
@@ -105,69 +99,87 @@ public class AccountService {
 
     // Delete
     public Status deleteAccount(long id) {
-        try {
-            Account account = accountRepository.findById(id).orElseThrow();
-            User user = userRepository.findById(account.getUser().getId()).orElseThrow();
-            user.setAccount(null);
+    	Optional<Account> accountOptional = accountRepository.findById(id);
+    	if (accountOptional.isPresent()) {
+            Account account = accountOptional.get();
 
-            Iterable<Review> reviews = getReviewsFromAccount(id);
-                for (Review review : reviews) { review.setAccount(null); }
+            User user = account.getUser();
+            user.setAccount(null);
+            userRepository.save(user);
+
+            Iterable<Review> reviews = account.getReviews();
+            for (Review review : reviews) { 
+            	review.setAccount(null);
+            	reviewRepository.save(review);
+            }
 
             accountRepository.deleteById(account.getId());
             System.out.println("Successfully deleted account with Id: " + account.getId());
             return Status.SUCCESS;
-        } catch (NoSuchElementException e) {
-            System.err.println("Failed to delete account. Cannot find account on Id: " + id);
-        } catch (Exception e) {
-            System.err.println("Failed to delete account");
-            System.err.println(e.getMessage());
-        }
+    	}
         return Status.FAILED;
     }
 
+    public Account login(String email, String password) {
+    	// Check de user
+    	Optional<User> userOptional = userRepository.findByEmailAndAccountIsNotNull(email);
+    	if (userOptional.isEmpty()) {
+    		return null;
+    	}
 
-    // Andere methodes
-    public Status login(AccountDTO accountDTO){
-        try {
-            User user = userRepository.findByEmail(accountDTO.getEmail());
-            if (user != null && accountRepository.findById(user.getAccount().getId()).isPresent()) {
-                Account account = accountRepository.findById(user.getAccount().getId()).orElseThrow();
-                if (accountDTO.getPassword().equals(account.getPassword())) {
-                    System.out.println("Password is correct");
-                    return Status.SUCCESS;
-                } else {
-                    System.err.println("Password is incorrect");
-                }
-            } else {
-                System.err.println("Account doesn't exist on email: " + accountDTO.getEmail());
-                return Status.ACCOUNT_DOES_NOT_EXIST;
-            }
-        } catch (NoSuchElementException e) {
-            System.err.println("Failed to login. Cannot find email in database: " + accountDTO.getEmail());
-        } catch (Exception e) {
-            System.err.println("Error while logging in");
-            System.err.println(e.getMessage());
-        }
-        return Status.FAILED;
+    	User dbUser = userOptional.get();
+    	if (!dbUser.getAccount().getPassword().equalsIgnoreCase(password)) {
+    		return null;
+    	}
+    	
+    	// Generate token
+    	int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 100;
+        Random random = new Random();
+
+    	String generatedToken = random.ints(leftLimit, rightLimit + 1)
+    		      .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+    		      .limit(targetStringLength)
+    		      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+    		      .toString();
+
+    	dbUser.getAccount().setToken(generatedToken);
+    	accountRepository.save(dbUser.getAccount());
+    	
+    	return dbUser.getAccount();
+    	
+    	
+//        try {
+//            User user = userRepository.findByEmail(accountDTO.getEmail());
+//
+//            if (user != null && accountRepository.findById(user.getAccount().getId()).isPresent()) {
+//                Account account = accountRepository.findById(user.getAccount().getId()).orElseThrow();
+//
+//                if (accountDTO.getPassword().equals(account.getPassword())) {
+//                    System.out.println("Password is correct. ");
+//                    SessionDTO sessionDTO =  new SessionDTO(user.getId(), account.getId());
+//
+//                    if (account.getHotelId() == -100) {
+//                        return "/user_account";
+//                    } else {
+//                        return "/manager";
+//                    }
+//                } else {
+//                    System.err.println("Password is incorrect");
+//                }
+//
+//            } else {
+//                System.err.println("Account doesn't exist on email: " + accountDTO.getEmail());
+//                return "Account doesn't exist";
+//            }
+//        } catch (NoSuchElementException e) {
+//            System.err.println("Failed to login. Cannot find email in database: " + accountDTO.getEmail());
+//        } catch (Exception e) {
+//            System.err.println("Error while logging in");
+//            System.err.println(e.getMessage());
+//        }
+//        return "Failed to login";
     }
 
-
-    public SessionDTO getSessionDTO(String email){
-        try {
-            User user = userRepository.getAccountIdFromEmail(email);
-            if (user != null) {
-                System.out.println("Returning session DTO of email: " + email);
-                return new SessionDTO(user.getId(), user.getAccount().getId());
-            } else {
-                System.err.println("Account doesn't exist on email: " + email);
-                return null;
-            }
-        } catch (NoSuchElementException e) {
-            System.err.println("Failed to login. Cannot find email in database: " + email);
-        } catch (Exception e) {
-            System.err.println("Error while returning session DTO");
-            System.err.println(e.getMessage());
-        }
-        return null;
-    }
 }

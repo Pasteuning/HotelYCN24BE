@@ -1,11 +1,18 @@
 package nl.youngcapital.backend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class User {
@@ -34,10 +41,8 @@ public class User {
     private String phoneNumber;
     @OneToMany(mappedBy = "user")
     private List<Reservation> reservation = new ArrayList<>();
-    @OneToOne
+    @OneToOne(optional = true, mappedBy = "user")
     private Account account;
-
-
 
     public long getId() {
         return id;

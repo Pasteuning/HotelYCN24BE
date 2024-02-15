@@ -1,18 +1,23 @@
 package nl.youngcapital.backend.service;
 
-import nl.youngcapital.backend.model.*;
-import nl.youngcapital.backend.repository.HotelRepository;
-import nl.youngcapital.backend.repository.ReservationRepository;
-import nl.youngcapital.backend.repository.ReviewRepository;
-import nl.youngcapital.backend.repository.RoomRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+
+import nl.youngcapital.backend.model.Hotel;
+import nl.youngcapital.backend.model.Reservation;
+import nl.youngcapital.backend.model.ReservationDTO;
+import nl.youngcapital.backend.model.Review;
+import nl.youngcapital.backend.model.Room;
+import nl.youngcapital.backend.repository.HotelRepository;
+import nl.youngcapital.backend.repository.ReservationRepository;
+import nl.youngcapital.backend.repository.ReviewRepository;
+import nl.youngcapital.backend.repository.RoomRepository;
 
 @Service
 public class HotelService {

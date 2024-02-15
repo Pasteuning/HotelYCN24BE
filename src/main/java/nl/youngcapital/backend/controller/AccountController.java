@@ -1,14 +1,22 @@
 package nl.youngcapital.backend.controller;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import nl.youngcapital.backend.model.Account;
 import nl.youngcapital.backend.model.AccountDTO;
 import nl.youngcapital.backend.model.Review;
-import nl.youngcapital.backend.model.SessionDTO;
+import nl.youngcapital.backend.model.User;
 import nl.youngcapital.backend.service.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
@@ -24,9 +32,10 @@ public class AccountController {
         return accountService.createAccount(userId, account);
     }
 
+
     @PostMapping("/login")
-    public AccountService.Status login(@RequestBody AccountDTO accountDTO) {
-        return accountService.login(accountDTO);
+    public Account login(@RequestBody AccountDTO accountDTO) {
+        return accountService.login(accountDTO.getEmail(), accountDTO.getPassword());
     }
 
 
@@ -43,14 +52,15 @@ public class AccountController {
 
     @GetMapping("/account/{id}/reviews")
     public Iterable<Review> getReviewsFromAccount(@PathVariable ("id") long id) {
-        return accountService.getReviewsFromAccount(id);
-    }
+        Optional<Account> accountOptional = accountService.getAccount(id);
+        if (accountOptional.isPresent()) {
+        	Account account = accountOptional.get();
 
-    @GetMapping("/get-sessiondto")
-    public SessionDTO getSessionDTO(@RequestBody String email) {
-        return accountService.getSessionDTO(email);
-    }
+        	return account.getReviews();
+        }
 
+        return null;
+    }
 
     // Edit
     @PutMapping("/account/{id}/change-password")

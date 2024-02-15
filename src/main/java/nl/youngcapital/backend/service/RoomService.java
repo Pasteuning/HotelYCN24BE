@@ -1,5 +1,15 @@
 package nl.youngcapital.backend.service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import nl.youngcapital.backend.model.Hotel;
 import nl.youngcapital.backend.model.Reservation;
 import nl.youngcapital.backend.model.Room;
@@ -7,16 +17,6 @@ import nl.youngcapital.backend.model.RoomDTO;
 import nl.youngcapital.backend.repository.HotelRepository;
 import nl.youngcapital.backend.repository.ReservationRepository;
 import nl.youngcapital.backend.repository.RoomRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class RoomService {
@@ -36,7 +36,7 @@ public class RoomService {
             Hotel hotel = hotelRepository.findById(hotelId).orElseThrow();
             room.setHotel(hotel);
             roomRepository.save(room);
-            System.out.println("Room successfully created on Id: " + room.getId());
+            System.out.println("Successfully created room on Id: " + room.getId());
             return room;
         } catch (NoSuchElementException e) {
             System.err.println("Failed to create room. Cannot find hotel on Id: " + hotelId);

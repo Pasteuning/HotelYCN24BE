@@ -1,16 +1,18 @@
 package nl.youngcapital.backend.service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import nl.youngcapital.backend.model.Reservation;
 import nl.youngcapital.backend.model.ReservationDTO;
 import nl.youngcapital.backend.model.User;
 import nl.youngcapital.backend.repository.ReservationRepository;
 import nl.youngcapital.backend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -24,7 +26,7 @@ public class UserService {
     public User createUser (User user){
         user.setEmail(user.getEmail().toLowerCase());
         userRepository.save(user);
-        System.out.println("User successfully created on Id: " + user.getId());
+        System.out.println("Successfully created user on Id: " + user.getId());
         return user;
     }
 
@@ -38,14 +40,23 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public Iterable<ReservationDTO> findReservationsOfUser(long id) {
+    public Iterable<ReservationDTO> findReservationsOfUser(long id, String pastOrFuture) {
+        if (pastOrFuture == null) { pastOrFuture = "future"; }
+
         List<ReservationDTO> dtoList = new ArrayList<>();
 
         if (userRepository.existsById(id)) {
-            Iterable<Reservation> reservations = reservationRepository.findReservationsOfUser(id);
+            Iterable<Reservation> reservations;
+            if (pastOrFuture.equals("past")) {
+                reservations = reservationRepository.findPastReservationsOfUser(id);
+            } else {
+                reservations = reservationRepository.findReservationsOfUser(id);
+            }
+
             for (Reservation reservation : reservations){
                 dtoList.add(new ReservationDTO(reservation));
             }
+            dtoList.sort(Comparator.comparing(dto -> dto.getReservation().getCiDate()));
             System.out.println("Returning list of reservations from user with Id: " + id);
         }
         else {
