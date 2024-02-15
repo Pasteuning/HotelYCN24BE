@@ -1,9 +1,15 @@
 package nl.youngcapital.backend.model;
 
-import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Account {
@@ -24,7 +30,9 @@ public class Account {
     private User user;
     @OneToMany(mappedBy = "account")
     private List<Review> reviews = new ArrayList<>();
-
+    
+    @Column(length = 100, unique = true)
+    private String token;
 
     public long getId() {
         return id;
@@ -81,4 +89,12 @@ public class Account {
     public void setReviews(List<Review> review) {
         this.reviews = review;
     }
+    
+    public String getToken() {
+		return token;
+	}
+    
+    public void setToken(String token) {
+		this.token = token;
+	}
 }

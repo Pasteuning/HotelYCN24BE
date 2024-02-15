@@ -1,19 +1,17 @@
 package nl.youngcapital.backend.service;
 
-import nl.youngcapital.backend.model.Booking;
-import nl.youngcapital.backend.model.Reservation;
-import nl.youngcapital.backend.model.ReservationDTO;
-import nl.youngcapital.backend.repository.BookingRepository;
-import nl.youngcapital.backend.repository.ReservationRepository;
+import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Book;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import nl.youngcapital.backend.model.Booking;
+import nl.youngcapital.backend.model.Reservation;
+import nl.youngcapital.backend.repository.BookingRepository;
+import nl.youngcapital.backend.repository.ReservationRepository;
 
 @Service
 public class BookingService {

@@ -1,10 +1,10 @@
 package nl.youngcapital.backend.repository;
 
-import nl.youngcapital.backend.model.Reservation;
-import nl.youngcapital.backend.model.ReservationDTO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
+
+import nl.youngcapital.backend.model.Reservation;
 
 @Component
 public interface ReservationRepository extends CrudRepository<Reservation, Long> {

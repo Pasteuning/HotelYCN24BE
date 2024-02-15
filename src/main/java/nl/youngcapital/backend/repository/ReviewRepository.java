@@ -1,9 +1,10 @@
 package nl.youngcapital.backend.repository;
 
-import nl.youngcapital.backend.model.Review;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
+
+import nl.youngcapital.backend.model.Review;
 
 @Component
 public interface ReviewRepository extends CrudRepository<Review, Long> {

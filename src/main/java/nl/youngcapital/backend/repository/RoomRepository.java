@@ -1,9 +1,9 @@
 package nl.youngcapital.backend.repository;
 
-import nl.youngcapital.backend.model.Room;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
+
+import nl.youngcapital.backend.model.Room;
 
 @Component
 public interface RoomRepository extends CrudRepository<Room, Long> {

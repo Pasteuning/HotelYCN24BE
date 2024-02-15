@@ -1,13 +1,25 @@
 package nl.youngcapital.backend.controller;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.servlet.http.HttpServletRequest;
+import nl.youngcapital.backend.model.Account;
+import nl.youngcapital.backend.model.Account.Role;
 import nl.youngcapital.backend.model.Room;
 import nl.youngcapital.backend.model.RoomDTO;
 import nl.youngcapital.backend.service.RoomService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
@@ -19,8 +31,17 @@ public class RoomController {
 
     // Create
     @PostMapping("/createroom")
-    public Room createRoom (@RequestBody Room room, @RequestParam long hotelId){
-        return roomService.createRoom(room, hotelId);
+    public Room createRoom (@RequestBody Room room, @RequestParam long hotelId, HttpServletRequest request) {
+    	Account account = (Account)request.getAttribute("YC_ACCOUNT");
+    	if (account == null) {
+    		return null;
+    	}
+
+    	if (account.getRole() != Role.OWNER) {
+    		return null;
+    	}
+
+    	return roomService.createRoom(room, hotelId);
     }
 
 

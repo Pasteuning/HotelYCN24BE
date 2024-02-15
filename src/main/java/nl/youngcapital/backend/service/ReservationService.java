@@ -1,14 +1,21 @@
 package nl.youngcapital.backend.service;
 
-import nl.youngcapital.backend.model.*;
-import nl.youngcapital.backend.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import nl.youngcapital.backend.model.Reservation;
+import nl.youngcapital.backend.model.ReservationDTO;
+import nl.youngcapital.backend.model.Room;
+import nl.youngcapital.backend.model.User;
+import nl.youngcapital.backend.repository.BookingRepository;
+import nl.youngcapital.backend.repository.ReservationRepository;
+import nl.youngcapital.backend.repository.RoomRepository;
+import nl.youngcapital.backend.repository.UserRepository;
 
 @Service
 public class ReservationService {
