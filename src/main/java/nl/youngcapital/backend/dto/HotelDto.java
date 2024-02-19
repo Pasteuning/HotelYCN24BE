@@ -1,4 +1,6 @@
-package nl.youngcapital.backend.model;
+package nl.youngcapital.backend.dto;
+
+import nl.youngcapital.backend.model.Hotel;
 
 public class HotelDto {
     private String name;

@@ -6,13 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class User {
@@ -35,14 +29,17 @@ public class User {
     private String city;
     @Column(nullable = false, length = 80)
     private String country;
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 80)
     private String email;
-    @Column(length = 100)
+    @Column(length = 50)
     private String phoneNumber;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Reservation> reservation = new ArrayList<>();
     @OneToOne(optional = true, mappedBy = "user")
     private Account account;
+
+
+
 
     public long getId() {
         return id;

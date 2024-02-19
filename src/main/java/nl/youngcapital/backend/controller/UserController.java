@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import nl.youngcapital.backend.model.ReservationDTO;
+import nl.youngcapital.backend.dto.ReservationDTO;
 import nl.youngcapital.backend.model.User;
 import nl.youngcapital.backend.service.UserService;
 
@@ -27,8 +27,8 @@ public class UserController {
 
     // Create
     @PostMapping("/createuser")
-    public User createUser (@RequestBody User User) {
-        return userService.createUser(User);
+    public Long createUser (@RequestBody User user) {
+        return userService.createUser(user);
     }
 
 
@@ -52,7 +52,7 @@ public class UserController {
 
     // Edit
     @PutMapping ("/edituser/{id}")
-    public User editUser (@PathVariable ("id") long id, @RequestBody User updatedUser) {
+    public boolean editUser (@PathVariable ("id") long id, @RequestBody User updatedUser) {
         return userService.editUser(id, updatedUser);
     }
 

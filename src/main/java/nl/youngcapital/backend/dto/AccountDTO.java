@@ -1,4 +1,4 @@
-package nl.youngcapital.backend.model;
+package nl.youngcapital.backend.dto;
 
 public class AccountDTO {
     private String email;

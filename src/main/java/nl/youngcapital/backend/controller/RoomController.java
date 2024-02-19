@@ -14,11 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpServletRequest;
-import nl.youngcapital.backend.model.Account;
-import nl.youngcapital.backend.model.Account.Role;
 import nl.youngcapital.backend.model.Room;
-import nl.youngcapital.backend.model.RoomDTO;
+import nl.youngcapital.backend.dto.RoomDTO;
 import nl.youngcapital.backend.service.RoomService;
 
 @RestController
@@ -31,15 +28,17 @@ public class RoomController {
 
     // Create
     @PostMapping("/createroom")
-    public Room createRoom (@RequestBody Room room, @RequestParam long hotelId, HttpServletRequest request) {
-    	Account account = (Account)request.getAttribute("YC_ACCOUNT");
-    	if (account == null) {
-    		return null;
-    	}
+    public Room createRoom (@RequestBody Room room, @RequestParam long hotelId) {
 
-    	if (account.getRole() != Role.OWNER) {
-    		return null;
-    	}
+//        //BEVEILIGEN MET HTTPREQUEST
+//    	Account account = (Account)request.getAttribute("YC_ACCOUNT");
+//    	if (account == null) {
+//    		return null;
+//    	}
+//
+//    	if (account.getRole() != Role.OWNER) {
+//    		return null;
+//    	}
 
     	return roomService.createRoom(room, hotelId);
     }

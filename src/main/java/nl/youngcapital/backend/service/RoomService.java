@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import nl.youngcapital.backend.model.Hotel;
 import nl.youngcapital.backend.model.Reservation;
 import nl.youngcapital.backend.model.Room;
-import nl.youngcapital.backend.model.RoomDTO;
+import nl.youngcapital.backend.dto.RoomDTO;
 import nl.youngcapital.backend.repository.HotelRepository;
 import nl.youngcapital.backend.repository.ReservationRepository;
 import nl.youngcapital.backend.repository.RoomRepository;
@@ -183,6 +183,10 @@ public class RoomService {
                     !cancelled) {
                 available = false;
                 break;
+            } else if (suitableRoom.getReservation().get(i).getCiDate().isEqual(cid) &&
+                    suitableRoom.getReservation().get(i).getCoDate().isEqual(cod) &&
+                    !cancelled) {
+                available = false;
             }
         }
         return available;

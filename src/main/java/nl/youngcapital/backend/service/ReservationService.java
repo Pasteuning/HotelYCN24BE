@@ -1,21 +1,13 @@
 package nl.youngcapital.backend.service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
-
+import nl.youngcapital.backend.dto.ReservationDTO;
+import nl.youngcapital.backend.model.*;
+import nl.youngcapital.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import nl.youngcapital.backend.model.Reservation;
-import nl.youngcapital.backend.model.ReservationDTO;
-import nl.youngcapital.backend.model.Room;
-import nl.youngcapital.backend.model.User;
-import nl.youngcapital.backend.repository.BookingRepository;
-import nl.youngcapital.backend.repository.ReservationRepository;
-import nl.youngcapital.backend.repository.RoomRepository;
-import nl.youngcapital.backend.repository.UserRepository;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class ReservationService {
@@ -27,42 +19,72 @@ public class ReservationService {
     private UserRepository userRepository;
     @Autowired
     private BookingRepository bookingRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
 
 
     // Create
-    public boolean createReservation (ReservationDTO reservationDTO) {
-        try {
-            Reservation reservation = reservationDTO.getReservation();
-            ReservationDTO dto = new ReservationDTO(reservation);
+//    public boolean createReservation (ReservationDTO reservationDTO) {
+//        try {
+//            Reservation reservation = reservationDTO.getReservation();
+//            ReservationDTO dto = new ReservationDTO(reservation);
+//
+//            Room room = roomRepository.findById(reservationDTO.getRoomId())
+//                    .orElseThrow(() -> new NoSuchElementException("Cannot find room on Id: " + reservationDTO.getRoomId()));
+//            reservation.setRoom(room);
+//            dto.setRoomId(room.getId());
+//            dto.setHotelId(room.getHotel().getId());
+//            dto.setHotelName(room.getHotel().getName());
+//
+//            User user = userRepository.findById(reservationDTO.getUserId())
+//                    .orElseThrow((() -> new NoSuchElementException("Cannot find user on Id: " + reservationDTO.getUserId())));
+//            reservation.setUser(user);
+//            dto.setUserId(user.getId());
+//            dto.setFirstName(user.getFirstName());
+//            dto.setLastName(user.getLastName());
+//
+//            //zet surcharge op true indien er kinderen komen
+//            reservation.setSurcharge(reservationDTO.getReservation().getChildren() != 0);
+//            reservationRepository.save(reservation);
+//            System.out.println("Successfully created reservation on Id: " + reservation.getId());
+//            return true;
+//        } catch (NoSuchElementException e) {
+//            System.err.println("Failed to create reservation. " + e.getMessage());
+//        } catch (Exception e) {
+//            System.err.println("Error while creating reservation");
+//            System.err.println(e.getMessage());
+//        }
+//        return false;
+//    }
 
-            Room room = roomRepository.findById(reservationDTO.getRoomId())
-                    .orElseThrow(() -> new NoSuchElementException("Cannot find room on Id: " + reservationDTO.getRoomId()));
-            reservation.setRoom(room);
-            dto.setRoomId(room.getId());
-            dto.setHotelId(room.getHotel().getId());
-            dto.setHotelName(room.getHotel().getName());
 
-            User user = userRepository.findById(reservationDTO.getUserId())
-                    .orElseThrow((() -> new NoSuchElementException("Cannot find user on Id: " + reservationDTO.getUserId())));
-            reservation.setUser(user);
-            dto.setUserId(user.getId());
-            dto.setFirstName(user.getFirstName());
-            dto.setLastName(user.getLastName());
+    public String createReservation (ReservationDTO reservationDTO) {
 
-            //zet surcharge op true indien er kinderen komen
-            reservation.setSurcharge(reservationDTO.getReservation().getChildren() != 0);
-            reservationRepository.save(reservation);
-            System.out.println("Successfully created reservation on Id: " + reservation.getId());
-            return true;
-        } catch (NoSuchElementException e) {
-            System.err.println("Failed to create reservation. " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Error while creating reservation");
-            System.err.println(e.getMessage());
+        Optional<Room> room = roomRepository.findById(reservationDTO.getRoomId());
+        Optional<User> user = userRepository.findById(reservationDTO.getUserId());
+        Reservation reservation = reservationDTO.getReservation();
+
+        if (room.isEmpty() || user.isEmpty()) {
+            return null;
         }
-        return false;
+
+        String uuid = UUID.randomUUID().toString();
+
+        reservation.setRoom(room.get());
+        reservation.setUser(user.get());
+        //zet surcharge op true indien er kinderen komen
+        reservation.setSurcharge(reservationDTO.getReservation().getChildren() != 0);
+        reservation.setUuid(uuid);
+
+        reservationRepository.save(reservation);
+        System.out.println("Successfully created reservation on Id: " + reservation.getId());
+        return uuid;
     }
+
+
+
+
 
 
     // Read
@@ -146,6 +168,23 @@ public class ReservationService {
             return new ReservationDTO(reservation);
         } else return null;
     }
+
+    public String isReservationPaid(String uuid) {
+
+        Optional<Reservation> reservation = reservationRepository.findByUuid(uuid);
+
+
+
+        if (reservation.isEmpty()) {
+            return "NOT_FOUND";
+        } else if (reservation.get().getBooking() == null) {
+            return "NOT_PAID";
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            return reservation.get().getBooking().getDate().format(formatter);
+        }
+    }
+
 
 
      // Edit
@@ -242,10 +281,16 @@ public class ReservationService {
                         ", associated with reservation with Id: " + id);
             }
 
+            Optional<Account> account = accountRepository.findById(reservation.getUser().getAccount().getId());
+            if (account.isPresent()) {
+                account.get().setLoyaltyPoints((account.get().getLoyaltyPoints() - 100));
+                accountRepository.save(account.get());
+            }
+
             // Reserveringen worden niet verwijderd, maar op status CANCELLED gezet
             reservation.setStatus(Reservation.Status.CANCELLED);
             reservationRepository.save(reservation);
-            System.out.println("Reservation set to status CANCELLED for Id:" + id);
+            System.out.println("Reservation set to status CANCELLED for Id: " + id);
             return true;
         } catch (NoSuchElementException e) {
             System.err.println("Failed to delete reservation. Reservation with Id: " + id + " doesn't exist");

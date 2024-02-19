@@ -20,7 +20,7 @@ public class ReviewService {
     @Autowired
     private AccountRepository accountRepository;
 
-    public enum Status { SUCCESS, FAILED, TOO_MANY_CHARACTERS, TOO_MANY_STARS}
+    public enum Status { SUCCESS, FAILED, INVALID_INPUT }
 
     
     // Create

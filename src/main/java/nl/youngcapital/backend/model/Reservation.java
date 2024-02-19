@@ -1,6 +1,7 @@
 package nl.youngcapital.backend.model;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -33,11 +34,12 @@ public class Reservation {
     @Column(length = 500)
     private String specialRequest;
     private Status status = Status.RESERVED;
+    private String uuid;
     @ManyToOne
     private Room room;
     @ManyToOne
     private User user;
-    @OneToOne
+    @OneToOne(optional = true, mappedBy = "reservation")
     private Booking booking;
 
 
@@ -105,6 +107,14 @@ public class Reservation {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     @JsonIgnore

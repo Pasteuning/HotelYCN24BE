@@ -17,7 +17,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(nullable = false, length = 50)
-    private String Name;
+    private String name;
     @Column(nullable = false)
     private double rating;
     @Column(length = 1000)
@@ -38,11 +38,11 @@ public class Review {
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public double getRating() {

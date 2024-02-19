@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 
 import nl.youngcapital.backend.model.Reservation;
 
+import java.util.Optional;
+
 @Component
 public interface ReservationRepository extends CrudRepository<Reservation, Long> {
 
@@ -20,4 +22,8 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 
     @Query(value = "SELECT * FROM reservation WHERE user_id = ?1 AND ci_date < CURRENT_DATE", nativeQuery = true)
     Iterable<Reservation> findPastReservationsOfUser(long id);
+
+    Optional<Reservation> findByUuid(String uuid);
+
+    Optional<Reservation> findByUuidAndBookingIdIsNull(String uuid);
 }

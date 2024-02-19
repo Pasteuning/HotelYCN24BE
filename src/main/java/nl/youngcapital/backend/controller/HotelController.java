@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.youngcapital.backend.model.Hotel;
-import nl.youngcapital.backend.model.ReservationDTO;
+import nl.youngcapital.backend.dto.ReservationDTO;
 import nl.youngcapital.backend.model.Review;
 import nl.youngcapital.backend.model.Room;
 import nl.youngcapital.backend.service.HotelService;

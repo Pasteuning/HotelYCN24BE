@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import nl.youngcapital.backend.model.User;
 import nl.youngcapital.backend.repository.AccountRepository;
 import nl.youngcapital.backend.repository.ReviewRepository;
 import nl.youngcapital.backend.repository.UserRepository;
+
+import javax.swing.text.html.Option;
 
 @Service
 public class AccountService {
@@ -31,7 +34,7 @@ public class AccountService {
     public Status createAccount(long userId, Account account) {
         try {
             User user = userRepository.findById(userId).orElseThrow();
-            if (userRepository.getAccountIdFromEmail(user.getEmail()) != null) {
+            if (userRepository.findByEmailAndAccountIsNotNull(user.getEmail()).isPresent()) {
                 return Status.ACCOUNT_ALREADY_EXISTS;
             } else {
                 user.setAccount(account);
@@ -55,6 +58,42 @@ public class AccountService {
         }
     }
 
+    public Long createAccount2(Account account) {
+        if (isAnyFieldBlank(account.getUser())) {
+            System.err.println("User creation failed. All fields must be filled in.");
+            return null;
+        }
+
+        if (userRepository.findByEmailAndAccountIsNotNull(account.getUser().getEmail()).isPresent()) {
+            System.err.println("Account already exists on email: " + account.getUser().getEmail());
+            return null;
+        }
+
+        account.getUser().setEmail(account.getUser().getEmail().toLowerCase());
+        account.setLoyaltyPoints(0);
+        account.setRole(Account.Role.GUEST);
+        account.setHotelId(-100);
+        account.setUser(account.getUser());
+
+        userRepository.save(account.getUser());
+        accountRepository.save(account);
+
+        System.out.println("Successfully created account on Id: " + account.getId());
+        return account.getUser().getId();
+    }
+
+    private boolean isAnyFieldBlank(User user) {
+        return user.getFirstName() == null ||
+                user.getLastName() == null ||
+                user.getDateOfBirth() == null ||
+                user.getStreet() == null ||
+                user.getHouseNumber() == null ||
+                user.getZipCode() == null ||
+                user.getCity() == null ||
+                user.getCountry() == null ||
+                user.getEmail() == null;
+    }
+
 
     // Read
     public Iterable<Account> getAllAccounts() {
@@ -72,28 +111,19 @@ public class AccountService {
 
     }
 
+    public Optional<Account> getAccountFromToken(HttpServletRequest request) {
+        Account account = (Account)request.getAttribute("YC_ACCOUNT");
+        return Optional.ofNullable(account);
+    }
+
+
 
     // Edit
-    public Status changePassword(long id, String newPassword) {
-        try {
-            Account account = accountRepository.findById(id).orElseThrow();
-
-            if (newPassword.length() > 100) {
-                System.err.println("Password cannot have more than 100 characters");
-                return Status.FAILED;
-            }
-
-            account.setPassword(newPassword);
-            accountRepository.save(account);
-            System.out.println("Password successfully changed");
-            return Status.SUCCESS;
-        } catch (NoSuchElementException e) {
-            System.err.println("Failed to change password. Cannot find account on Id: " + id);
-        } catch (Exception e) {
-            System.err.println("Error while changing password");
-            System.err.println(e.getMessage());
-        }
-        return Status.FAILED;
+    public boolean changePassword(Account account, String newPassword) {
+        account.setPassword(newPassword);
+        accountRepository.save(account);
+        System.out.println("New password successfully saved");
+        return true;
     }
 
 
@@ -119,6 +149,7 @@ public class AccountService {
     	}
         return Status.FAILED;
     }
+
 
     public Account login(String email, String password) {
     	// Check de user
@@ -148,38 +179,11 @@ public class AccountService {
     	accountRepository.save(dbUser.getAccount());
     	
     	return dbUser.getAccount();
-    	
-    	
-//        try {
-//            User user = userRepository.findByEmail(accountDTO.getEmail());
-//
-//            if (user != null && accountRepository.findById(user.getAccount().getId()).isPresent()) {
-//                Account account = accountRepository.findById(user.getAccount().getId()).orElseThrow();
-//
-//                if (accountDTO.getPassword().equals(account.getPassword())) {
-//                    System.out.println("Password is correct. ");
-//                    SessionDTO sessionDTO =  new SessionDTO(user.getId(), account.getId());
-//
-//                    if (account.getHotelId() == -100) {
-//                        return "/user_account";
-//                    } else {
-//                        return "/manager";
-//                    }
-//                } else {
-//                    System.err.println("Password is incorrect");
-//                }
-//
-//            } else {
-//                System.err.println("Account doesn't exist on email: " + accountDTO.getEmail());
-//                return "Account doesn't exist";
-//            }
-//        } catch (NoSuchElementException e) {
-//            System.err.println("Failed to login. Cannot find email in database: " + accountDTO.getEmail());
-//        } catch (Exception e) {
-//            System.err.println("Error while logging in");
-//            System.err.println(e.getMessage());
-//        }
-//        return "Failed to login";
     }
 
+
+    public boolean isEmailAvailable(String email) {
+        Optional<User> userOptional = userRepository.findByEmailAndAccountIsNotNull(email);
+        return userOptional.isEmpty();
+    }
 }
