@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import nl.youngcapital.backend.model.Reservation;
-import nl.youngcapital.backend.model.ReservationDTO;
+import nl.youngcapital.backend.dto.ReservationDTO;
 import nl.youngcapital.backend.model.User;
 import nl.youngcapital.backend.repository.ReservationRepository;
 import nl.youngcapital.backend.repository.UserRepository;
@@ -23,11 +23,28 @@ public class UserService {
 
 
     // Create
-    public User createUser (User user){
+    public Long createUser (User user){
+        if (isAnyFieldBlank(user)) {
+            System.err.println("User creation failed. All fields must be filled in.");
+            return null;
+        }
+
         user.setEmail(user.getEmail().toLowerCase());
         userRepository.save(user);
         System.out.println("Successfully created user on Id: " + user.getId());
-        return user;
+        return user.getId();
+    }
+
+    private boolean isAnyFieldBlank(User user) {
+        return user.getFirstName() == null ||
+                user.getLastName() == null ||
+                user.getDateOfBirth() == null ||
+                user.getStreet() == null ||
+                user.getHouseNumber() == null ||
+                user.getZipCode() == null ||
+                user.getCity() == null ||
+                user.getCountry() == null ||
+                user.getEmail() == null;
     }
 
 
@@ -57,7 +74,7 @@ public class UserService {
                 dtoList.add(new ReservationDTO(reservation));
             }
             dtoList.sort(Comparator.comparing(dto -> dto.getReservation().getCiDate()));
-            System.out.println("Returning list of reservations from user with Id: " + id);
+//            System.out.println("Returning list of reservations from user with Id: " + id);
         }
         else {
             System.err.println("Failed to get reservations. Cannot find user on Id: " + id);
@@ -67,41 +84,48 @@ public class UserService {
 
 
     // Edit
-    public User editUser(long id, User updatedUser)  {
-        User User = userRepository.findById(id).orElseThrow();
-        if (updatedUser.getFirstName() != null) {
-            User.setFirstName(updatedUser.getFirstName());
-        }
-        if (updatedUser.getLastName() != null) {
-            User.setLastName(updatedUser.getLastName());
-        }
-        if (updatedUser.getDateOfBirth() != null) {
-            User.setDateOfBirth(updatedUser.getDateOfBirth());
-        }
-        if (updatedUser.getStreet() != null) {
-            User.setStreet(updatedUser.getStreet());
-        }
-        if (updatedUser.getHouseNumber() != null) {
-            User.setHouseNumber(updatedUser.getHouseNumber());
-        }
-        if (updatedUser.getZipCode() != null) {
-            User.setZipCode(updatedUser.getZipCode());
-        }
-        if (updatedUser.getCity() != null) {
-            User.setCity(updatedUser.getCity());
-        }
-        if (updatedUser.getCountry() != null) {
-            User.setCountry(updatedUser.getCountry());
-        }
-        if (updatedUser.getEmail() != null) {
-            User.setEmail(updatedUser.getEmail());
-        }
-        if (updatedUser.getPhoneNumber() != null) {
-            User.setPhoneNumber(updatedUser.getPhoneNumber());
+    public boolean editUser(long id, User updatedUser)  {
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            System.err.println("User doesn't exist on Id: " + id);
+            return false;
         }
 
-        userRepository.save(User);
-        return User;
+        if (updatedUser.getFirstName() != null) {
+            user.get().setFirstName(updatedUser.getFirstName());
+        }
+        if (updatedUser.getLastName() != null) {
+            user.get().setLastName(updatedUser.getLastName());
+        }
+        if (updatedUser.getDateOfBirth() != null) {
+            user.get().setDateOfBirth(updatedUser.getDateOfBirth());
+        }
+        if (updatedUser.getStreet() != null) {
+            user.get().setStreet(updatedUser.getStreet());
+        }
+        if (updatedUser.getHouseNumber() != null) {
+            user.get().setHouseNumber(updatedUser.getHouseNumber());
+        }
+        if (updatedUser.getZipCode() != null) {
+            user.get().setZipCode(updatedUser.getZipCode());
+        }
+        if (updatedUser.getCity() != null) {
+            user.get().setCity(updatedUser.getCity());
+        }
+        if (updatedUser.getCountry() != null) {
+            user.get().setCountry(updatedUser.getCountry());
+        }
+        if (updatedUser.getEmail() != null) {
+            user.get().setEmail(updatedUser.getEmail());
+        }
+        if (updatedUser.getPhoneNumber() != null) {
+            user.get().setPhoneNumber(updatedUser.getPhoneNumber());
+        }
+
+        userRepository.save(user.get());
+        System.out.println("Successfully saved user with Id: " + id);
+        return true;
     }
 
 

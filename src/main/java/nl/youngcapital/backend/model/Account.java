@@ -3,13 +3,7 @@ package nl.youngcapital.backend.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class Account {
@@ -28,11 +22,13 @@ public class Account {
     private long hotelId; // -100 (default) = user, 0 = owner, 1+ = staff of hotel ${hotelId}
     @OneToOne
     private User user;
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
     private List<Review> reviews = new ArrayList<>();
     
     @Column(length = 100, unique = true)
     private String token;
+
+
 
     public long getId() {
         return id;

@@ -49,12 +49,12 @@ public class ReviewController {
     		return null;
     	}
     	
-    	if (review.getRating() > 5) {
-	    	System.err.println("Rating cannot be more than 5 stars");
-	    	return Status.TOO_MANY_STARS;
+    	if (review.getRating() < 1 || review.getRating() > 5) {
+	    	System.err.println("Rating should be between 1 and 5 stars");
+	    	return Status.INVALID_INPUT;
 	    } else if (review.getComment().length() > 1000){
 	    	System.err.println("Comment cannot contain more than 1000 characters");
-	    	return Status.TOO_MANY_CHARACTERS;
+	    	return Status.INVALID_INPUT;
 	    }
     	
     	Review dbReview = new Review();
@@ -65,7 +65,7 @@ public class ReviewController {
     	dbReview.setRating(review.getRating());
     	dbReview.setDate(LocalDateTime.now());
 
-        reviewService.createReview(review);
+        reviewService.createReview(dbReview);
 
         return ReviewService.Status.SUCCESS;
     }

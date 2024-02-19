@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import nl.youngcapital.backend.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import nl.youngcapital.backend.model.Booking;
@@ -19,29 +19,62 @@ public class BookingService {
     private BookingRepository bookingRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
 
 
     // Create
-    public boolean createBooking(long reservationId, Booking booking) {
-        try {
-            booking.setDate(LocalDateTime.now());
-            Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
-            reservation.setStatus(Reservation.Status.BOOKED);
-            reservation.setBooking((booking));
-            booking.setReservation(reservation);
+//    public boolean createBooking(long reservationId, Booking booking) {
+//        try {
+//            booking.setDate(LocalDateTime.now());
+//            Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
+//            reservation.setStatus(Reservation.Status.BOOKED);
+//            reservation.setBooking((booking));
+//            booking.setReservation(reservation);
+//
+//            bookingRepository.save(booking);
+//            reservationRepository.save(reservation);
+//            System.out.println("Successfully created booking on Id: " + booking.getId());
+//            return true;
+//        } catch (NoSuchElementException e) {
+//            System.err.println("Failed to create booking. Reservation doesn't exist on Id: " + booking.getReservation().getId());
+//            return false;
+//        } catch (DataAccessException e) {
+//            System.err.println("Failed to save booking to the database: " + e.getMessage());
+//            return false;
+//        }
+//    }
 
-            bookingRepository.save(booking);
-            reservationRepository.save(reservation);
-            System.out.println("Successfully created booking on Id: " + booking.getId());
-            return true;
-        } catch (NoSuchElementException e) {
-            System.err.println("Failed to create booking. Reservation doesn't exist on Id: " + booking.getReservation().getId());
-            return false;
-        } catch (DataAccessException e) {
-            System.err.println("Failed to save booking to the database: " + e.getMessage());
+    public boolean createBooking(String uuid) {
+        Optional<Reservation> reservation = reservationRepository.findByUuidAndBookingIdIsNull(uuid);
+
+        if (reservation.isEmpty()) {
+            System.err.println("Failed to create booking. Reservation doesn't exist on uuid: " + uuid);
+            System.err.println("or booking already exists on this uuid");
             return false;
         }
+
+        Booking booking = new Booking();
+
+//        Optional<Account> account = accountRepository.findById(reservation.get().getUser().getAccount().getId());
+        // Loyalty points geven indien er een account is
+        if (reservation.get().getUser().getAccount() != null) {
+            reservation.get().getUser().getAccount().setLoyaltyPoints((reservation.get().getUser().getAccount().getLoyaltyPoints() + 100));
+            accountRepository.save(reservation.get().getUser().getAccount());
+        }
+
+        reservation.get().setStatus(Reservation.Status.BOOKED);
+
+        booking.setDate(LocalDateTime.now());
+        booking.setPaymentMethod(Booking.PaymentMethod.IDEAL);
+        booking.setReservation(reservation.get());
+
+        bookingRepository.save(booking);
+        reservationRepository.save(reservation.get());
+
+        System.out.println("Successfully created booking on Id: " + booking.getId());
+        return true;
     }
 
 

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import nl.youngcapital.backend.model.Hotel;
 import nl.youngcapital.backend.model.Reservation;
-import nl.youngcapital.backend.model.ReservationDTO;
+import nl.youngcapital.backend.dto.ReservationDTO;
 import nl.youngcapital.backend.model.Review;
 import nl.youngcapital.backend.model.Room;
 import nl.youngcapital.backend.repository.HotelRepository;
@@ -47,7 +47,6 @@ public class HotelService {
 
     // Read
     public Iterable<Hotel> getAllHotels(){
-        System.out.println("Returning list of all hotels");
         return hotelRepository.findAll();
     }
 

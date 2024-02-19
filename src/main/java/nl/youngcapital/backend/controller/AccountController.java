@@ -2,6 +2,7 @@ package nl.youngcapital.backend.controller;
 
 import java.util.Optional;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,9 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.youngcapital.backend.model.Account;
-import nl.youngcapital.backend.model.AccountDTO;
+import nl.youngcapital.backend.dto.AccountDTO;
 import nl.youngcapital.backend.model.Review;
-import nl.youngcapital.backend.model.User;
 import nl.youngcapital.backend.service.AccountService;
 
 @RestController
@@ -30,6 +30,11 @@ public class AccountController {
     @PostMapping("/create-account/{userId}")
     public AccountService.Status createAccount(@PathVariable ("userId") long userId, @RequestBody Account account) {
         return accountService.createAccount(userId, account);
+    }
+
+    @PostMapping("/create-account")
+    public Long createAccount2(@RequestBody Account account) {
+        return accountService.createAccount2(account);
     }
 
 
@@ -50,6 +55,12 @@ public class AccountController {
         return accountService.getAccount(accountId);
     }
 
+    @GetMapping("/get-account")
+    public Optional<Account> getAccountFromToken(HttpServletRequest request) {
+        return accountService.getAccountFromToken(request);
+    }
+
+
     @GetMapping("/account/{id}/reviews")
     public Iterable<Review> getReviewsFromAccount(@PathVariable ("id") long id) {
         Optional<Account> accountOptional = accountService.getAccount(id);
@@ -62,10 +73,30 @@ public class AccountController {
         return null;
     }
 
+
+
+
     // Edit
-    @PutMapping("/account/{id}/change-password")
-    public AccountService.Status changePassword(@PathVariable ("id") long id, @RequestBody String newPassword) {
-        return accountService.changePassword(id, newPassword);
+    @PutMapping("/account/change-password")
+    public boolean changePassword(@RequestBody String newPassword, HttpServletRequest request) {
+        Account account = (Account) request.getAttribute("YC_ACCOUNT");
+
+        if (account == null) {
+            System.err.println("Invalid Token");
+            return false;
+        }
+
+        if (newPassword.length() > 100) {
+            System.err.println("Password cannot have more than 100 characters");
+            return false;
+        }
+
+        if (newPassword.isBlank()) {
+            System.err.println("Password cannot be blank");
+            return false;
+        }
+
+        return accountService.changePassword(account, newPassword);
     }
 
 
@@ -77,5 +108,10 @@ public class AccountController {
 
 
 
+    // Andere methodes
+    @PostMapping("is-email-available")
+    public boolean isEmailAvailable(@RequestBody String email) {
+        return accountService.isEmailAvailable(email);
+    }
 }
 

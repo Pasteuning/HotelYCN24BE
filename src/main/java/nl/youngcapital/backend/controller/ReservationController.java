@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import nl.youngcapital.backend.model.ReservationDTO;
+import nl.youngcapital.backend.dto.ReservationDTO;
 import nl.youngcapital.backend.service.ReservationService;
 
 @RestController
@@ -24,7 +24,7 @@ public class ReservationController {
 
     // Create
     @PostMapping("/createreservation")
-    public boolean createReservation(@RequestBody ReservationDTO reservationDTO) {
+    public String createReservation(@RequestBody ReservationDTO reservationDTO) {
         return reservationService.createReservation(reservationDTO);
     }
 
@@ -40,6 +40,11 @@ public class ReservationController {
         return reservationService.getReservation(id);
     }
 
+    @GetMapping("/reservation-status")
+    public String isReservationPaid(@RequestParam String uuid) {
+        return reservationService.isReservationPaid(uuid);
+    }
+
 
 
     // Edit
@@ -52,7 +57,7 @@ public class ReservationController {
     // Delete
     @DeleteMapping("/cancel-reservation/{id}")
     public boolean cancelReservation(@PathVariable ("id") long id) {
-         return reservationService.cancelReservation(id);
+        return reservationService.cancelReservation(id);
     }
 
 
