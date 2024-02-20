@@ -6,6 +6,7 @@ public class RoomDTO {
     private long id;
     private String hotelName;
     private Room.RoomType roomType;
+    private String description;
     private int noBeds;
     private double price;
 
@@ -14,6 +15,7 @@ public class RoomDTO {
         this.id = room.getId();
         this.hotelName = room.getHotel().getName();
         this.roomType = room.getRoomType();
+        this.description = room.getDescription();
         this.noBeds = room.getNoBeds();
         this.price = room.getPrice();
     }
@@ -40,6 +42,14 @@ public class RoomDTO {
 
     public void setRoomType(Room.RoomType roomType) {
         this.roomType = roomType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getNoBeds() {

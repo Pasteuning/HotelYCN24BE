@@ -90,7 +90,7 @@ public class RoomService {
 
     public Status setRoomDescription(long hotelId, String roomType, String description) {
         try {
-            Room.RoomType rtEnum = Room.RoomType.valueOf(roomType);
+            Room.RoomType rtEnum = Room.RoomType.valueOf(roomType.toUpperCase());
 
             if (description == null) { description = ""; }
 
@@ -126,38 +126,76 @@ public class RoomService {
 
 
     // Andere methoden
+//    public Iterable<RoomDTO> searchRooms (long hotelId, LocalDate cid, LocalDate cod, int adults, int children) {
+//        if (hotelRepository.existsById(hotelId)) {
+//            Hotel hotel = hotelRepository.findById(hotelId).orElseThrow();
+//
+//            // Zoekt naar geschikte kamers op basis van aantal bedden
+//            List<Room> suitableRooms = new ArrayList<>();
+//            for (int i = 0; i < hotel.getRooms().size(); i++) {
+//                if ((adults + children) <= hotel.getRooms().get(i).getNoBeds()) {
+//                    suitableRooms.add(hotel.getRooms().get(i));
+//                }
+//            }
+//
+//            // Hier komen de beschikbare kamers in
+//            List<RoomDTO> availableRooms = new ArrayList<>();
+//
+//            // Gaat elke kamer af van de geschikte kamers af
+//            for (Room suitableRoom : suitableRooms) {
+//                boolean available = checkAvailability(suitableRoom, cid, cod);
+//
+//                // Indien de kamer beschikbaar is, wordt de totaalprijs berekend waarna de kamer in de availableRooms gezet
+//                if (available) {
+//                    RoomDTO room = new RoomDTO(suitableRoom);
+//                    room.setPrice(calculatePrice(room.getPrice(), cid, cod, children));
+//                    availableRooms.add(room);
+//                }
+//            }
+//            if (availableRooms.isEmpty()) {
+//                System.out.println("No available rooms found");
+//            }
+//            return availableRooms;
+//        } else return null;
+//    }
+
+
     public Iterable<RoomDTO> searchRooms (long hotelId, LocalDate cid, LocalDate cod, int adults, int children) {
-        if (hotelRepository.existsById(hotelId)) {
-            Hotel hotel = hotelRepository.findById(hotelId).orElseThrow();
+        Optional<Hotel> hotel = hotelRepository.findById(hotelId);
 
-            // Zoekt naar geschikte kamers op basis van aantal bedden
-            List<Room> suitableRooms = new ArrayList<>();
-            for (int i = 0; i < hotel.getRooms().size(); i++) {
-                if ((adults + children) <= hotel.getRooms().get(i).getNoBeds()) {
-                    suitableRooms.add(hotel.getRooms().get(i));
-                }
-            }
+        if (hotel.isEmpty()) {
+            System.err.println("Cannot find hotel on Id: " + hotelId);
+            return null;
+        }
 
-            // Hier komen de beschikbare kamers in
-            List<RoomDTO> availableRooms = new ArrayList<>();
-            
-            // Gaat elke kamer af van de geschikte kamers af
-            for (Room suitableRoom : suitableRooms) {
-                boolean available = checkAvailability(suitableRoom, cid, cod);
+        // Zoekt naar geschikte kamers op basis van aantal bedden
+        List<Room> suitableRooms = new ArrayList<>();
+        for (int i = 0; i < hotel.get().getRooms().size(); i++) {
+            if ((adults + children) <= hotel.get().getRooms().get(i).getNoBeds()) {
+                suitableRooms.add(hotel.get().getRooms().get(i));
+            }
+        }
 
-                // Indien de kamer beschikbaar is, wordt de totaalprijs berekend waarna de kamer in de availableRooms gezet
-                if (available) {
-                    RoomDTO room = new RoomDTO(suitableRoom);
-                    room.setPrice(calculatePrice(room.getPrice(), cid, cod, children));
-                    availableRooms.add(room);
-                }
+        // Hier komen de beschikbare kamers in
+        List<RoomDTO> availableRooms = new ArrayList<>();
+
+        // Gaat elke kamer af van de geschikte kamers af
+        for (Room suitableRoom : suitableRooms) {
+            // Indien de kamer beschikbaar is, wordt de totaalprijs berekend waarna de kamer in de availableRooms gezet
+            if ((checkAvailability(suitableRoom, cid, cod)) && (!isDuplicateRoom(suitableRoom, availableRooms))) {
+                RoomDTO room = new RoomDTO(suitableRoom);
+                room.setPrice(calculatePrice(room.getPrice(), cid, cod, children));
+                availableRooms.add(room);
             }
-            if (availableRooms.isEmpty()) {
-                System.out.println("No available rooms found");
-            }
-            return availableRooms;
-        } else return null;
+        }
+
+
+        if (availableRooms.isEmpty()) {
+            System.out.println("No available rooms found");
+        }
+        return availableRooms;
     }
+
 
     private boolean checkAvailability(Room suitableRoom, LocalDate cid, LocalDate cod) {
         // Gaat alle bestaande reserveringen per geschikte kamer af 
@@ -203,8 +241,37 @@ public class RoomService {
         return totalPrice;
     }
 
+    private boolean isDuplicateRoom(Room evaluate, List<RoomDTO> roomList) {
 
+        if (roomList.isEmpty()) {
+            return false;
+        }
 
+        // checkt of er al een duplicaat in de lijst staat
+        for (RoomDTO r : roomList) {
 
+            // null pointer error omzeilen omdat description nullable is
+            if (evaluate.getDescription() == null && r.getDescription() != null ||
+                evaluate.getDescription() != null && r.getDescription() == null) {
+                continue;
+            }
 
+            if (evaluate.getDescription() != null && r.getDescription() != null) {
+                if (evaluate.getRoomType().equals(r.getRoomType()) &&
+                    evaluate.getNoBeds() == r.getNoBeds() &&
+                    evaluate.getDescription().equals(r.getDescription()) &&
+                    evaluate.getPrice() == r.getPrice()) {
+                    return true;
+                }
+
+            } else {
+                if (evaluate.getRoomType().equals(r.getRoomType()) &&
+                    evaluate.getNoBeds() == r.getNoBeds() &&
+                    evaluate.getPrice() == r.getPrice()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
