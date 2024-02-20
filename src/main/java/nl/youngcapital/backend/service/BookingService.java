@@ -55,9 +55,13 @@ public class BookingService {
             return false;
         }
 
+        if (reservation.get().getStatus() == Reservation.Status.CANCELLED) {
+            System.err.println("Reservation with uuid " + uuid + " is already cancelled. Create new reservation");
+            return false;
+        }
+
         Booking booking = new Booking();
 
-//        Optional<Account> account = accountRepository.findById(reservation.get().getUser().getAccount().getId());
         // Loyalty points geven indien er een account is
         if (reservation.get().getUser().getAccount() != null) {
             reservation.get().getUser().getAccount().setLoyaltyPoints((reservation.get().getUser().getAccount().getLoyaltyPoints() + 100));
