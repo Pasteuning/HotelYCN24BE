@@ -1,4 +1,9 @@
 FROM gradle:jdk17-alpine AS build
+
+ENV DB_USERNAME=yc2401
+ENV DB_PASSWORD=abcd1234ABCD!@#$
+
+
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle build --no-daemon 
