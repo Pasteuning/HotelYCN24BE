@@ -1,4 +1,6 @@
-package nl.youngcapital.backend.model;
+package nl.youngcapital.backend.dto;
+
+import nl.youngcapital.backend.model.Reservation;
 
 public class ReservationDTO {
     private Long hotelId;
@@ -8,17 +10,6 @@ public class ReservationDTO {
     private Long userId;
     private String firstName;
     private String lastName;
-
-
-//    public ReservationDTO(Reservation reservation) {
-//        this.hotelId = reservation.getRoom().getHotel().getId();
-//        this.hotelName = reservation.getRoom().getHotel().getName();
-//        this.roomId = reservation.getRoom().getId();
-//        this.reservation = reservation;
-//        this.userId = reservation.getUser().getId();
-//        this.firstName = reservation.getUser().getFirstName();
-//        this.lastName = reservation.getUser().getLastName();
-//    }
 
 
     public ReservationDTO(Long hotelId, String hotelName, Long roomId, Reservation reservation, Long userId, String firstName, String lastName) {
@@ -97,19 +88,5 @@ public class ReservationDTO {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-
-    @Override
-    public String toString() {
-        return "ReservationDTO{" +
-                "hotelId=" + hotelId +
-                ", hotelName='" + hotelName + '\'' +
-                ", roomId=" + roomId +
-                ", reservation=" + reservation +
-                ", userId=" + userId +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                '}';
     }
 }

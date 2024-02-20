@@ -1,18 +1,13 @@
 package nl.youngcapital.backend.service;
 
-import nl.youngcapital.backend.model.Reservation;
-import nl.youngcapital.backend.model.ReservationDTO;
-import nl.youngcapital.backend.model.Room;
-import nl.youngcapital.backend.model.User;
-import nl.youngcapital.backend.repository.ReservationRepository;
-import nl.youngcapital.backend.repository.RoomRepository;
-import nl.youngcapital.backend.repository.UserRepository;
+import nl.youngcapital.backend.dto.ReservationDTO;
+import nl.youngcapital.backend.model.*;
+import nl.youngcapital.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class ReservationService {
@@ -22,10 +17,79 @@ public class ReservationService {
     private RoomRepository roomRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BookingRepository bookingRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
 
 
+    // Create
+//    public boolean createReservation (ReservationDTO reservationDTO) {
+//        try {
+//            Reservation reservation = reservationDTO.getReservation();
+//            ReservationDTO dto = new ReservationDTO(reservation);
+//
+//            Room room = roomRepository.findById(reservationDTO.getRoomId())
+//                    .orElseThrow(() -> new NoSuchElementException("Cannot find room on Id: " + reservationDTO.getRoomId()));
+//            reservation.setRoom(room);
+//            dto.setRoomId(room.getId());
+//            dto.setHotelId(room.getHotel().getId());
+//            dto.setHotelName(room.getHotel().getName());
+//
+//            User user = userRepository.findById(reservationDTO.getUserId())
+//                    .orElseThrow((() -> new NoSuchElementException("Cannot find user on Id: " + reservationDTO.getUserId())));
+//            reservation.setUser(user);
+//            dto.setUserId(user.getId());
+//            dto.setFirstName(user.getFirstName());
+//            dto.setLastName(user.getLastName());
+//
+//            //zet surcharge op true indien er kinderen komen
+//            reservation.setSurcharge(reservationDTO.getReservation().getChildren() != 0);
+//            reservationRepository.save(reservation);
+//            System.out.println("Successfully created reservation on Id: " + reservation.getId());
+//            return true;
+//        } catch (NoSuchElementException e) {
+//            System.err.println("Failed to create reservation. " + e.getMessage());
+//        } catch (Exception e) {
+//            System.err.println("Error while creating reservation");
+//            System.err.println(e.getMessage());
+//        }
+//        return false;
+//    }
+
+
+    public String createReservation (ReservationDTO reservationDTO) {
+
+        Optional<Room> room = roomRepository.findById(reservationDTO.getRoomId());
+        Optional<User> user = userRepository.findById(reservationDTO.getUserId());
+        Reservation reservation = reservationDTO.getReservation();
+
+        if (room.isEmpty() || user.isEmpty()) {
+            return null;
+        }
+
+        String uuid = UUID.randomUUID().toString();
+
+        reservation.setRoom(room.get());
+        reservation.setUser(user.get());
+        //zet surcharge op true indien er kinderen komen
+        reservation.setSurcharge(reservationDTO.getReservation().getChildren() != 0);
+        reservation.setUuid(uuid);
+
+        reservationRepository.save(reservation);
+        System.out.println("Successfully created reservation on Id: " + reservation.getId());
+        return uuid;
+    }
+
+
+
+
+
+
+    // Read
     public Iterable<ReservationDTO> getAllReservations(String sort) {
+        // Stuurt een ReservationDTO lijst terug
         Iterable<Reservation> reservations = reservationRepository.findAll();
         List<ReservationDTO> DTOList = new ArrayList<>();
 
@@ -33,10 +97,11 @@ public class ReservationService {
             DTOList.add(new ReservationDTO(reservation));
         }
         return sortList(DTOList, sort);
-//        return DTOList;
     }
 
     public List<ReservationDTO> sortList(List<ReservationDTO> list, String sort) {
+        // Als er geen sort-waarde is meegegeven, wordt er gesorteerd op roomId (default)
+        if (sort == null) { sort = ""; }
         switch (sort) {
             case "hotelId":
                 list.sort(Comparator.comparingLong(dto -> {
@@ -48,12 +113,6 @@ public class ReservationService {
                 list.sort(Comparator.comparing(dto -> {
                     String hotelName = dto.getHotelName();
                     return hotelName != null ? hotelName : "";
-                }));
-                break;
-            case "roomId":
-                list.sort(Comparator.comparingLong(dto -> {
-                    Long roomId = dto.getRoomId();
-                    return roomId != null ? roomId : Long.MIN_VALUE;
                 }));
                 break;
             case "reservationId":
@@ -95,6 +154,11 @@ public class ReservationService {
                     return lastName != null ? lastName : "";
                 }));
                 break;
+            default:
+                list.sort(Comparator.comparingLong(dto -> {
+                    Long roomId = dto.getRoomId();
+                    return roomId != null ? roomId : Long.MIN_VALUE;
+                }));
         } return list;
     }
 
@@ -105,89 +169,137 @@ public class ReservationService {
         } else return null;
     }
 
-    public ReservationDTO createReservation (ReservationDTO reservationDTO) {
-        Reservation reservation = reservationDTO.getReservation();
-        ReservationDTO dto = new ReservationDTO(reservation);
-        if (roomRepository.existsById(reservationDTO.getRoomId())) {
-            Room room = roomRepository.findById(reservationDTO.getRoomId()).orElseThrow();
-            reservation.setRoom(room);
-            dto.setRoomId(room.getId());
-            dto.setHotelId(room.getHotel().getId());
-            dto.setHotelName(room.getHotel().getName());
-        }
-        if (userRepository.existsById(reservationDTO.getUserId())) {
-            User user = userRepository.findById(reservationDTO.getUserId()).orElseThrow();
-            reservation.setUser(user);
-            dto.setUserId(user.getId());
-            dto.setFirstName(user.getFirstName());
-            dto.setLastName(user.getLastName());
-        }
+    public String isReservationPaid(String uuid) {
 
-        //zet surcharge op true indien er kinderen komen
-        reservation.setSurcharge(reservationDTO.getReservation().getChildren() != 0);
-        reservationRepository.save(reservation);
-        System.out.println("Reservation successfully created: \n" + reservation);
-        return dto;
-    }
+        Optional<Reservation> reservation = reservationRepository.findByUuid(uuid);
 
-    public void deleteReservation (long id) {
-        if (reservationRepository.existsById(id)) {
-            reservationRepository.deleteById(id);
-            System.out.println("Reservation successfully deleted for Id:" + id);
+
+
+        if (reservation.isEmpty()) {
+            return "NOT_FOUND";
+        } else if (reservation.get().getBooking() == null) {
+            return "NOT_PAID";
         } else {
-            System.out.println("Reservation not found for Id: " + id);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            return reservation.get().getBooking().getDate().format(formatter);
         }
     }
 
-//    public ReservationDTO editReservation(long id, ReservationDTO updatedReservation) {
-//
-//        if (reservationRepository.existsById(id)) {
+
+
+     // Edit
+    public boolean editReservation(long id, ReservationDTO updatedReservation) {
+        try {
+            Reservation reservation = reservationRepository.findById(id)
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find reservation on Id: " + id));
+            Room room = roomRepository.findById(updatedReservation.getRoomId())
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find room on Id: " + updatedReservation.getRoomId()));
+            reservation.setRoom(room);
+
+            if (updatedReservation.getReservation().getCiDate() != null) {
+                reservation.setCiDate(updatedReservation.getReservation().getCiDate());
+            }
+            if (updatedReservation.getReservation().getCoDate() != null) {
+                reservation.setCoDate(updatedReservation.getReservation().getCoDate());
+            }
+            if (updatedReservation.getReservation().getAdults() != 0) {
+                reservation.setAdults(updatedReservation.getReservation().getAdults());
+            }
+            reservation.setChildren(updatedReservation.getReservation().getChildren());
+            reservation.setSurcharge(updatedReservation.getReservation().getChildren() != 0);
+            if (updatedReservation.getReservation().getSpecialRequest() != null) {
+                reservation.setSpecialRequest(updatedReservation.getReservation().getSpecialRequest());
+            }
+            reservation.setStatus(Reservation.Status.RESERVED);
+
+            reservationRepository.save(reservation);
+            System.out.println("Reservation successfully edited");
+            return true;
+        } catch (NoSuchElementException e) {
+            System.err.println("Failed to edit reservation. " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error while editing reservation");
+            System.err.println(e.getMessage());
+        }
+        return false;
+    }
+
+
+//    public boolean editReservation(long id, ReservationDTO updatedReservation) {
+//        try {
 //            Reservation reservation = reservationRepository.findById(id).orElseThrow();
-//            if (updatedReservation.getCiDate() != null) {
-//                reservation.setCiDate(updatedReservation.getCiDate());
+//            Room room = roomRepository.findById(updatedReservation.getRoomId()).orElseThrow();
+//            reservation.setRoom(room);
+//
+//            if (updatedReservation.getReservation().getCiDate() != null) {
+//                reservation.setCiDate(updatedReservation.getReservation().getCiDate());
 //            }
-//            if (updatedReservation.getCoDate() != null) {
-//                reservation.setCoDate(updatedReservation.getCoDate());
+//            if (updatedReservation.getReservation().getCoDate() != null) {
+//                reservation.setCoDate(updatedReservation.getReservation().getCoDate());
 //            }
-//            if (updatedReservation.getAdults() != 0) {
-//                reservation.setAdults(updatedReservation.getAdults());
+//            if (updatedReservation.getReservation().getAdults() != 0) {
+//                reservation.setAdults(updatedReservation.getReservation().getAdults());
 //            }
-//            reservation.setChildren(updatedReservation.getChildren());
-//            //zet surcharge op true indien er kinderen komen
-//            reservation.setSurcharge(updatedReservation.getChildren() != 0);
+//            reservation.setChildren(updatedReservation.getReservation().getChildren());
+//            reservation.setSurcharge(updatedReservation.getReservation().getChildren() != 0);
+//            if (updatedReservation.getReservation().getSpecialRequest() != null) {
+//                reservation.setSpecialRequest(updatedReservation.getReservation().getSpecialRequest());
+//            }
+//            reservation.setStatus(Reservation.Status.RESERVED);
 //
 //            reservationRepository.save(reservation);
-//            System.out.println("Reservation successfully updated: \n" + reservation);
-//            return reservation;
-//        } else {
-//            //creëert een nieuwe reservation als de reservation niet bestaat
-//            System.out.println("Reservation not found for id: " + id);
-//            System.out.println("Creating new reservation");
-//            return createReservation(updatedReservation);
+//            System.out.println("Reservation successfully edited");
+//            return true;
+//        } catch (NoSuchElementException e) {
+//            System.out.println(e.getMessage());
+//            if (e.getMessage().contains("reservation")) {
+//                System.err.println("Failed to edit reservation. Cannot find reservation on Id: " + id);
+//            } else {
+//                System.err.println("Failed to edit reservation. Cannot find room on Id: " + updatedReservation.getRoomId());
+//            }
+//        } catch (Exception e) {
+//            System.err.println("Error while editing reservation");
+//            System.err.println(e.getMessage());
 //        }
+//        return false;
 //    }
 
-    public void assignRoom(long reservationId, long roomId) {
-        if (reservationRepository.existsById(reservationId) && roomRepository.existsById(roomId)) {
-            Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
-            Room room = roomRepository.findById(roomId).orElseThrow();
-            reservation.setRoom(room);
+
+    // Delete
+    public boolean cancelReservation(long id) {
+        // Met deze methode wordt de booking verwijderd en de reservering op status CANCELLED gezet
+
+        try {
+            Reservation reservation = reservationRepository.findById(id).orElseThrow();
+
+            // Als er een Booking is gekoppeld aan de reservering, wordt de booking verwijderd
+            if (reservation.getBooking() != null) {
+                long bookingId = reservation.getBooking().getId();
+                reservation.setBooking(null);
+                bookingRepository.deleteById(bookingId);
+                System.out.println("Successfully deleted booking with Id: " + bookingId +
+                        ", associated with reservation with Id: " + id);
+            }
+
+            Optional<Account> account = accountRepository.findById(reservation.getUser().getAccount().getId());
+            if (account.isPresent()) {
+                account.get().setLoyaltyPoints((account.get().getLoyaltyPoints() - 100));
+                accountRepository.save(account.get());
+            }
+
+            // Reserveringen worden niet verwijderd, maar op status CANCELLED gezet
+            reservation.setStatus(Reservation.Status.CANCELLED);
             reservationRepository.save(reservation);
-            System.out.println("Reservation Id: " + reservationId + " successfully assigned to Room Id: " + roomId);
-        } else {
-            System.out.println("Room not found");
+            System.out.println("Reservation set to status CANCELLED for Id: " + id);
+            return true;
+        } catch (NoSuchElementException e) {
+            System.err.println("Failed to delete reservation. Reservation with Id: " + id + " doesn't exist");
+        } catch (Exception e) {
+            System.err.println("Failed to cancel reservation with Id: " + id);
+            System.err.println(e.getMessage());
         }
+        return false;
     }
 
-    public void assignUser(long reservationId, long userId) {
-        if (reservationRepository.existsById(reservationId) && userRepository.existsById(userId)) {
-            Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
-            User user = userRepository.findById(userId).orElseThrow();
-            reservation.setUser(user);
-            reservationRepository.save(reservation);
-            System.out.println("Reservation Id: " + reservationId + " successfully assigned to User Id: " + userId);
-        } else {
-            System.out.println("User not found");
-        }
-    }
+
 }

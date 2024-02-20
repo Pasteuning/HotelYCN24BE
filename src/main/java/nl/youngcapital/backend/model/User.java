@@ -1,10 +1,12 @@
 package nl.youngcapital.backend.model;
 
-import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 
 @Entity
 public class User {
@@ -27,12 +29,15 @@ public class User {
     private String city;
     @Column(nullable = false, length = 80)
     private String country;
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 80)
     private String email;
-    @Column(length = 100)
+    @Column(length = 50)
     private String phoneNumber;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Reservation> reservation = new ArrayList<>();
+    @OneToOne(optional = true, mappedBy = "user")
+    private Account account;
+
 
 
 
@@ -130,5 +135,15 @@ public class User {
 
     public void setReservation(List<Reservation> reservation) {
         this.reservation = reservation;
+    }
+
+    @JsonIgnore
+    public Account getAccount() {
+        return account;
+    }
+
+    @JsonIgnore
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

@@ -1,13 +1,21 @@
 package nl.youngcapital.backend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-
 import java.time.LocalDate;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Reservation {
-    public enum Status { LOOKING, RESERVED, BOOKED }
+    public enum Status { RESERVED, BOOKED, CANCELLED }
 
 
     @Id
@@ -23,11 +31,16 @@ public class Reservation {
     private int children;
     @Column(nullable = false)
     private boolean surcharge;
-    private Status status = Status.LOOKING;
+    @Column(length = 500)
+    private String specialRequest;
+    private Status status = Status.RESERVED;
+    private String uuid;
     @ManyToOne
     private Room room;
     @ManyToOne
     private User user;
+    @OneToOne(optional = true, mappedBy = "reservation")
+    private Booking booking;
 
 
 
@@ -80,12 +93,28 @@ public class Reservation {
         this.surcharge = surcharge;
     }
 
+    public String getSpecialRequest() {
+        return specialRequest;
+    }
+
+    public void setSpecialRequest(String specialRequest) {
+        this.specialRequest = specialRequest;
+    }
+
     public Status getStatus() {
         return status;
     }
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     @JsonIgnore
@@ -108,18 +137,11 @@ public class Reservation {
         this.user = user;
     }
 
+    public Booking getBooking() {
+        return booking;
+    }
 
-    @Override
-    public String toString() {
-        return "Reservation{" +
-                ", ciDate=" + ciDate +
-                ", coDate=" + coDate +
-                ", adults=" + adults +
-                ", children=" + children +
-                ", surcharge=" + surcharge +
-                ", status=" + status +
-                ", room=" + room +
-                ", user=" + user +
-                '}';
+    public void setBooking(Booking booking) {
+        this.booking = booking;
     }
 }
