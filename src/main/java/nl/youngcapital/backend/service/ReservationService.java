@@ -25,40 +25,6 @@ public class ReservationService {
 
 
     // Create
-//    public boolean createReservation (ReservationDTO reservationDTO) {
-//        try {
-//            Reservation reservation = reservationDTO.getReservation();
-//            ReservationDTO dto = new ReservationDTO(reservation);
-//
-//            Room room = roomRepository.findById(reservationDTO.getRoomId())
-//                    .orElseThrow(() -> new NoSuchElementException("Cannot find room on Id: " + reservationDTO.getRoomId()));
-//            reservation.setRoom(room);
-//            dto.setRoomId(room.getId());
-//            dto.setHotelId(room.getHotel().getId());
-//            dto.setHotelName(room.getHotel().getName());
-//
-//            User user = userRepository.findById(reservationDTO.getUserId())
-//                    .orElseThrow((() -> new NoSuchElementException("Cannot find user on Id: " + reservationDTO.getUserId())));
-//            reservation.setUser(user);
-//            dto.setUserId(user.getId());
-//            dto.setFirstName(user.getFirstName());
-//            dto.setLastName(user.getLastName());
-//
-//            //zet surcharge op true indien er kinderen komen
-//            reservation.setSurcharge(reservationDTO.getReservation().getChildren() != 0);
-//            reservationRepository.save(reservation);
-//            System.out.println("Successfully created reservation on Id: " + reservation.getId());
-//            return true;
-//        } catch (NoSuchElementException e) {
-//            System.err.println("Failed to create reservation. " + e.getMessage());
-//        } catch (Exception e) {
-//            System.err.println("Error while creating reservation");
-//            System.err.println(e.getMessage());
-//        }
-//        return false;
-//    }
-
-
     public String createReservation (ReservationDTO reservationDTO) {
 
         Optional<Room> room = roomRepository.findById(reservationDTO.getRoomId());
@@ -173,8 +139,7 @@ public class ReservationService {
 
         Optional<Reservation> reservation = reservationRepository.findByUuid(uuid);
 
-
-
+        // Stuurt een datum uit indien de reservering al betaald is
         if (reservation.isEmpty()) {
             return "NOT_FOUND";
         } else if (reservation.get().getBooking() == null) {
@@ -272,6 +237,15 @@ public class ReservationService {
         try {
             Reservation reservation = reservationRepository.findById(id).orElseThrow();
 
+            // Als er een booking en een account is, worden er loyalty punten van het account gehaald
+            Optional<Account> account = accountRepository.findById(reservation.getUser().getAccount().getId());
+            if (account.isPresent() && reservation.getBooking() != null) {
+                account.get().setLoyaltyPoints((account.get().getLoyaltyPoints() - 100));
+                System.out.println("Loyalty points removed on account: " + account.get().getId());
+                accountRepository.save(account.get());
+            }
+
+
             // Als er een Booking is gekoppeld aan de reservering, wordt de booking verwijderd
             if (reservation.getBooking() != null) {
                 long bookingId = reservation.getBooking().getId();
@@ -281,11 +255,6 @@ public class ReservationService {
                         ", associated with reservation with Id: " + id);
             }
 
-            Optional<Account> account = accountRepository.findById(reservation.getUser().getAccount().getId());
-            if (account.isPresent()) {
-                account.get().setLoyaltyPoints((account.get().getLoyaltyPoints() - 100));
-                accountRepository.save(account.get());
-            }
 
             // Reserveringen worden niet verwijderd, maar op status CANCELLED gezet
             reservation.setStatus(Reservation.Status.CANCELLED);
